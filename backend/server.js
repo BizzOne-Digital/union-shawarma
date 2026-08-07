@@ -22,20 +22,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/menu', require('./routes/menuRoutes'));
-app.use('/api/categories', require('./routes/categoryRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/gallery', require('./routes/galleryRoutes'));
-app.use('/api/settings', require('./routes/settingsRoutes'));
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'The Union Shawarma API is running' });
-});
-
 // MongoDB connection (cached across serverless invocations)
 let isConnected = false;
 const connectDB = async () => {
@@ -53,6 +39,20 @@ app.use(async (req, res, next) => {
     console.error('MongoDB connection error:', err);
     res.status(500).json({ message: 'Database connection error' });
   }
+});
+
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/menu', require('./routes/menuRoutes'));
+app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/gallery', require('./routes/galleryRoutes'));
+app.use('/api/settings', require('./routes/settingsRoutes'));
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'The Union Shawarma API is running' });
 });
 
 // Run as a standalone server locally; Vercel imports `app` as a serverless function
