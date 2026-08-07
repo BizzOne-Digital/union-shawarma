@@ -88,8 +88,10 @@ const Footer = () => {
         <div className="container">
           <p>© 2024 The Union Shawarma. All Rights Reserved.</p>
           <div className="footer-bottom-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+            <a href="#" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+            <a href="#" onClick={(e) => e.preventDefault()}>Terms of Service</a>
           </div>
         </div>
       </div>

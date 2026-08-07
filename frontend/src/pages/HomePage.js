@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Flame, Leaf, Truck, Star, ArrowRight, Plus, ShoppingBag } from 'lucide-react';
-import { getMenuItems, getSettings } from '../utils/api';
+import { getMenuItems } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import './HomePage.css';
 

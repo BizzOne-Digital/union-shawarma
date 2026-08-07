@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Plus, Filter } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { getMenuItems, getCategories } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import './MenuPage.css';

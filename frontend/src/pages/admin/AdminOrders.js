@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { RefreshCw, ChevronDown } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { getAllOrders, updateOrderStatus } from '../../utils/api';
 import toast from 'react-hot-toast';
 import './AdminOrders.css';
@@ -31,6 +31,7 @@ const AdminOrders = () => {
     finally { setLoading(false); }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [filterStatus, page]);
 
   const handleStatusChange = async (orderId, newStatus) => {

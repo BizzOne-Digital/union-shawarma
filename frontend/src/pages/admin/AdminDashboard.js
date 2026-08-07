@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Users, DollarSign, Clock, TrendingUp, ArrowRight, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Users, DollarSign, Clock, ArrowRight, AlertCircle } from 'lucide-react';
 import { getOrderStats, getUserStats, getAllOrders } from '../../utils/api';
 import './AdminDashboard.css';
 
