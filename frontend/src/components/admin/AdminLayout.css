@@ -1,0 +1,196 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #F0F2F5;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+  width: 260px;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 900;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.admin-layout.collapsed .admin-sidebar { width: 72px; }
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  min-height: 70px;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.logo-icon { font-size: 24px; flex-shrink: 0; }
+
+.logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: white;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.logo-text-wrap .orange { color: var(--orange); }
+
+.collapse-btn {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.6);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.collapse-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.collapse-btn svg.rotated { transform: rotate(180deg); }
+.collapse-btn svg { transition: transform 0.3s ease; }
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  color: rgba(255,255,255,0.6);
+  transition: var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+.nav-item.active { background: var(--orange); color: white; }
+.nav-item.active .nav-icon { color: white; }
+
+.nav-icon { display: flex; align-items: center; flex-shrink: 0; }
+.nav-label { font-size: 14px; font-weight: 500; }
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+.admin-avatar {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--orange);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.admin-name { font-size: 13px; font-weight: 600; color: white; white-space: nowrap; }
+.admin-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+.logout-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.5);
+  background: transparent;
+  font-size: 14px; font-weight: 500;
+  transition: var(--transition);
+  width: 100%;
+}
+.logout-btn:hover { background: rgba(211,47,47,0.15); color: #ef5350; }
+
+/* MAIN */
+.admin-main {
+  flex: 1;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-layout.collapsed .admin-main { margin-left: 72px; }
+
+.admin-topbar {
+  background: white;
+  padding: 0 28px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: var(--gray-light);
+  color: var(--dark);
+}
+
+.topbar-title { font-size: 20px; font-weight: 700; color: var(--dark); flex: 1; }
+
+.view-site-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  background: rgba(245,124,0,0.1);
+  color: var(--orange);
+  font-size: 14px; font-weight: 600;
+  transition: var(--transition);
+}
+.view-site-btn:hover { background: var(--orange); color: white; }
+
+.admin-content { padding: 28px; flex: 1; }
+
+.admin-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 850;
+}
+
+.desktop-only { display: flex; }
+
+@media (max-width: 900px) {
+  .admin-sidebar { transform: translateX(-100%); }
+  .admin-sidebar.mobile-open { transform: translateX(0); }
+  .admin-main { margin-left: 0; }
+  .mobile-menu-btn { display: flex; }
+  .admin-overlay { display: block; }
+  .desktop-only { display: none; }
+  .admin-layout.collapsed .admin-main { margin-left: 0; }
+}
