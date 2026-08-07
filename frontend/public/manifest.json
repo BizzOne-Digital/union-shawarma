@@ -1,0 +1,15 @@
+{
+  "short_name": "The Union Shawarma",
+  "name": "The Union Shawarma",
+  "icons": [
+    {
+      "src": "fav.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#F57C00",
+  "background_color": "#ffffff"
+}
