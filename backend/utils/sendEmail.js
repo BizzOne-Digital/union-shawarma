@@ -14,7 +14,7 @@ const getTransporter = () =>
 const sendCateringNotification = async (request) => {
   const to = process.env.CATERING_NOTIFY_EMAIL;
   if (!smtpConfigured() || !to) {
-    console.log('SMTP/CATERING_NOTIFY_EMAIL not configured — skipping catering email notification. Request saved to DB only.');
+    console.log('[email] SKIPPED catering notification — SMTP_HOST/SMTP_USER/SMTP_PASS/CATERING_NOTIFY_EMAIL not fully configured. Request saved to DB only.');
     return;
   }
 
@@ -29,18 +29,24 @@ const sendCateringNotification = async (request) => {
     <p><strong>Message:</strong> ${request.message || '—'}</p>
   `;
 
-  await getTransporter().sendMail({
-    from: `"The Union Shawarma Website" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `New Catering Inquiry from ${request.name}`,
-    html,
-  });
+  try {
+    const info = await getTransporter().sendMail({
+      from: `"The Union Shawarma Website" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `New Catering Inquiry from ${request.name}`,
+      html,
+    });
+    console.log(`[email] SENT catering notification to ${to} (messageId: ${info.messageId})`);
+  } catch (err) {
+    console.error(`[email] FAILED to send catering notification to ${to}:`, err.message);
+    throw err;
+  }
 };
 
 const sendOrderNotification = async (order) => {
   const to = process.env.ORDER_NOTIFY_EMAIL || process.env.CATERING_NOTIFY_EMAIL;
   if (!smtpConfigured() || !to) {
-    console.log('SMTP/ORDER_NOTIFY_EMAIL not configured — skipping order email notification. Order saved to DB only.');
+    console.log('[email] SKIPPED order notification — SMTP_HOST/SMTP_USER/SMTP_PASS/ORDER_NOTIFY_EMAIL not fully configured. Order saved to DB only.');
     return;
   }
 
@@ -59,12 +65,18 @@ const sendOrderNotification = async (order) => {
     <p><strong>Special Instructions:</strong> ${order.specialInstructions || '—'}</p>
   `;
 
-  await getTransporter().sendMail({
-    from: `"The Union Shawarma Website" <${process.env.SMTP_USER}>`,
-    to,
-    subject: `New Order — $${order.totalAmount.toFixed(2)}`,
-    html,
-  });
+  try {
+    const info = await getTransporter().sendMail({
+      from: `"The Union Shawarma Website" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `New Order — $${order.totalAmount.toFixed(2)}`,
+      html,
+    });
+    console.log(`[email] SENT order notification to ${to} (messageId: ${info.messageId})`);
+  } catch (err) {
+    console.error(`[email] FAILED to send order notification to ${to}:`, err.message);
+    throw err;
+  }
 };
 
 module.exports = { sendCateringNotification, sendOrderNotification };
