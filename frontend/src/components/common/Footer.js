@@ -6,9 +6,13 @@ import './Footer.css';
 
 const Footer = () => {
   const [deliveryPartners, setDeliveryPartners] = useState({});
+  const [socialLinks, setSocialLinks] = useState({});
 
   useEffect(() => {
-    getSettings().then((res) => setDeliveryPartners(res.data?.deliveryPartners || {})).catch(() => {});
+    getSettings().then((res) => {
+      setDeliveryPartners(res.data?.deliveryPartners || {});
+      setSocialLinks(res.data?.socialLinks || {});
+    }).catch(() => {});
   }, []);
 
   const hours = [
@@ -32,7 +36,7 @@ const Footer = () => {
                 <a href="https://www.instagram.com/theunionshawarma" target="_blank" rel="noreferrer" aria-label="Instagram">
                   <Instagram size={18} />
                 </a>
-                <a href="https://www.facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+                <a href={socialLinks.facebook || 'https://www.facebook.com'} target="_blank" rel="noreferrer" aria-label="Facebook">
                   <Facebook size={18} />
                 </a>
               </div>

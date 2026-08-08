@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, Clock, Instagram, Facebook, MapPin } from 'lucide-react';
+import { getSettings } from '../utils/api';
 import './ContactPage.css';
 
 const ContactPage = () => {
+  const [socialLinks, setSocialLinks] = useState({});
+
+  useEffect(() => {
+    getSettings().then((res) => setSocialLinks(res.data?.socialLinks || {})).catch(() => {});
+  }, []);
+
   const hours = [
     { day: 'Monday – Thursday', time: '11:30 AM – 9:00 PM' },
     { day: 'Friday', time: '11:30 AM – 12:00 AM' },
@@ -55,7 +62,7 @@ const ContactPage = () => {
               <div style={{ display: 'flex', gap: '12px' }}>
                 {[
                   { icon: <Instagram size={20} />, label: '@Theunionshawarma', href: 'https://www.instagram.com/theunionshawarma', color: '#E1306C' },
-                  { icon: <Facebook size={20} />, label: 'Facebook', href: '#', color: '#1877F2' },
+                  { icon: <Facebook size={20} />, label: 'Facebook', href: socialLinks.facebook || 'https://www.facebook.com', color: '#1877F2' },
                 ].map((s, i) => (
                   <a key={i} href={s.href} target="_blank" rel="noreferrer"
                     style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', color: 'var(--dark)', transition: 'all 0.2s', fontWeight: '600', fontSize: '14px' }}>
