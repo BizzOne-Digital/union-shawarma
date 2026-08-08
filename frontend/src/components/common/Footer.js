@@ -49,7 +49,7 @@ const Footer = () => {
                     { label: 'Skip', href: deliveryPartners.skipTheDishes },
                   ].map((p) => (
                     p.href
-                      ? <a key={p.label} href={p.href} target="_blank" rel="noreferrer" className="delivery-badge">{p.label}</a>
+                      ? <a key={p.label} href={p.href} className="delivery-badge">{p.label}</a>
                       : <span key={p.label} className="delivery-badge">{p.label}</span>
                   ))}
                 </div>
