@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, Clock, Instagram, Facebook, MapPin } from 'lucide-react';
+import './ContactPage.css';
 
 const ContactPage = () => {
   const hours = [
@@ -19,7 +20,7 @@ const ContactPage = () => {
           <p style={{ color: 'var(--gray)', marginTop: '12px', fontSize: '17px' }}>Have a question, catering inquiry, or just want to say hi?</p>
         </motion.div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'start' }}>
+        <div className="contact-grid">
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}>
             <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: '36px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', marginBottom: '24px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px' }}>Contact Information</h3>

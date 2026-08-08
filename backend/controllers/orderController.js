@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const { sendOrderNotification } = require('../utils/sendEmail');
 
 const createOrder = async (req, res) => {
   const { items, totalAmount, orderType, specialInstructions, guestName, guestEmail, guestPhone } = req.body;
@@ -9,6 +10,13 @@ const createOrder = async (req, res) => {
     guestName, guestEmail, guestPhone,
     items, totalAmount, orderType, specialInstructions,
   });
+
+  try {
+    await sendOrderNotification(order);
+  } catch (err) {
+    console.error('Failed to send order notification email:', err.message);
+  }
+
   res.status(201).json(order);
 };
 
