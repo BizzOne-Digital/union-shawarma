@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Flame, Leaf, Truck, Star, ArrowRight, Plus, ShoppingBag } from 'lucide-react';
 import { getMenuItems } from '../utils/api';
 import { useCart } from '../context/CartContext';
+import CustomizeModal from '../components/common/CustomizeModal';
 import './HomePage.css';
 
 const fadeUp = {
@@ -13,6 +14,16 @@ const fadeUp = {
 
 const MenuCard = ({ item }) => {
   const { addToCart } = useCart();
+  const [customizeItem, setCustomizeItem] = useState(null);
+
+  const handleAddClick = () => {
+    if (item.customizationGroups?.length > 0) {
+      setCustomizeItem(item);
+    } else {
+      addToCart(item);
+    }
+  };
+
   return (
     <motion.div className="menu-card" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
       <div className="menu-card-img">
@@ -25,11 +36,19 @@ const MenuCard = ({ item }) => {
         <p>{item.description}</p>
         <div className="menu-card-footer">
           <span className="price">${item.price.toFixed(2)}</span>
-          <button className="add-btn" onClick={() => addToCart(item)} aria-label={`Add ${item.name} to cart`}>
+          <button className="add-btn" onClick={handleAddClick} aria-label={`Add ${item.name} to cart`}>
             <Plus size={18} />
           </button>
         </div>
       </div>
+
+      {customizeItem && (
+        <CustomizeModal
+          item={customizeItem}
+          onClose={() => setCustomizeItem(null)}
+          onConfirm={(selections) => { addToCart(customizeItem, selections); setCustomizeItem(null); }}
+        />
+      )}
     </motion.div>
   );
 };

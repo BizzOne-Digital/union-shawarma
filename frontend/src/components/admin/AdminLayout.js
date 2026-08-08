@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag, Users,
-  Image, Settings, Tag, LogOut, Menu, ChevronRight
+  Image, Settings, Tag, LogOut, Menu, ChevronRight, Heart
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PageTransition from '../common/PageTransition';
@@ -15,6 +15,7 @@ const navItems = [
   { label: 'Orders', path: '/admin/orders', icon: <ShoppingBag size={20} /> },
   { label: 'Users', path: '/admin/users', icon: <Users size={20} /> },
   { label: 'Gallery', path: '/admin/gallery', icon: <Image size={20} /> },
+  { label: 'Catering', path: '/admin/catering', icon: <Heart size={20} /> },
   { label: 'Settings', path: '/admin/settings', icon: <Settings size={20} /> },
 ];
 

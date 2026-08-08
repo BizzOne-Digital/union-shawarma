@@ -26,7 +26,7 @@ const Navbar = () => {
     { label: 'Home', path: '/' },
     { label: 'Menu', path: '/menu' },
     { label: 'About', path: '/about' },
-    { label: 'Gallery', path: '/gallery' },
+    { label: 'Catering', path: '/catering' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'Contact', path: '/contact' },
   ];

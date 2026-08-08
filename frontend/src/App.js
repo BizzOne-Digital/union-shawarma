@@ -8,7 +8,7 @@ import { CartProvider } from './context/CartContext';
 import HomePage from './pages/HomePage';
 import MenuPage from './pages/MenuPage';
 import AboutPage from './pages/AboutPage';
-import GalleryPage from './pages/GalleryPage';
+import CateringPage from './pages/CateringPage';
 import PricingPage from './pages/PricingPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
@@ -29,6 +29,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminGallery from './pages/admin/AdminGallery';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminCategories from './pages/admin/AdminCategories';
+import AdminCatering from './pages/admin/AdminCatering';
 
 // Layout
 import Navbar from './components/common/Navbar';
@@ -64,7 +65,7 @@ function AppRoutes() {
       <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
       <Route path="/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
       <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
-      <Route path="/gallery" element={<PublicLayout><GalleryPage /></PublicLayout>} />
+      <Route path="/catering" element={<PublicLayout><CateringPage /></PublicLayout>} />
       <Route path="/pricing" element={<PublicLayout><PricingPage /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
       <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
@@ -84,6 +85,7 @@ function AppRoutes() {
       <Route path="/admin/orders" element={<AdminRoute><AdminLayout><AdminOrders /></AdminLayout></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
       <Route path="/admin/gallery" element={<AdminRoute><AdminLayout><AdminGallery /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/catering" element={<AdminRoute><AdminLayout><AdminCatering /></AdminLayout></AdminRoute>} />
       <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSettings /></AdminLayout></AdminRoute>} />
     </Routes>
   );

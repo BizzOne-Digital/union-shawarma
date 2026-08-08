@@ -48,6 +48,9 @@ npm start
 | `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
+| `FRONTEND_URL` | Deployed frontend URL(s) for CORS, comma-separated |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Optional — SMTP creds to email catering inquiries. If unset, requests are still saved to the DB and visible in Admin → Catering, just no email is sent. |
+| `CATERING_NOTIFY_EMAIL` | Optional — inbox that receives catering inquiry emails (requires SMTP vars above) |
 
 ### Frontend `.env`
 | Variable | Description |

@@ -36,20 +36,27 @@ const CartPage = () => {
           <div className="cart-items">
             <AnimatePresence>
               {cartItems.map(item => (
-                <motion.div key={item._id} className="cart-item" layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                <motion.div key={item.cartId} className="cart-item" layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                   <img src={item.image || '/placeholder-food.jpg'} alt={item.name} className="cart-item-img" />
                   <div className="cart-item-info">
                     <h3>{item.name}</h3>
                     <p>${item.price.toFixed(2)} each</p>
+                    {item.customizations && Object.keys(item.customizations).length > 0 && (
+                      <div className="cart-item-customizations">
+                        {Object.entries(item.customizations).map(([group, options]) => (
+                          <span key={group} className="customization-tag">{options.join(', ')}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="cart-item-controls">
                     <div className="qty-control">
-                      <button onClick={() => updateQuantity(item._id, item.quantity - 1)}><Minus size={14} /></button>
+                      <button onClick={() => updateQuantity(item.cartId, item.quantity - 1)}><Minus size={14} /></button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item._id, item.quantity + 1)}><Plus size={14} /></button>
+                      <button onClick={() => updateQuantity(item.cartId, item.quantity + 1)}><Plus size={14} /></button>
                     </div>
                     <span className="item-subtotal">${(item.price * item.quantity).toFixed(2)}</span>
-                    <button className="remove-btn" onClick={() => removeFromCart(item._id)}><Trash2 size={16} /></button>
+                    <button className="remove-btn" onClick={() => removeFromCart(item.cartId)}><Trash2 size={16} /></button>
                   </div>
                 </motion.div>
               ))}

@@ -3,6 +3,8 @@ import toast from 'react-hot-toast';
 
 const CartContext = createContext();
 
+const buildCartId = (itemId, customizations) => `${itemId}::${JSON.stringify(customizations || {})}`;
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     try { return JSON.parse(localStorage.getItem('unionCart')) || []; }
@@ -13,25 +15,26 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('unionCart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item) => {
+  const addToCart = (item, customizations = {}) => {
+    const cartId = buildCartId(item._id, customizations);
     setCartItems((prev) => {
-      const existing = prev.find((i) => i._id === item._id);
+      const existing = prev.find((i) => i.cartId === cartId);
       if (existing) {
         toast.success('Quantity updated!');
-        return prev.map((i) => i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map((i) => i.cartId === cartId ? { ...i, quantity: i.quantity + 1 } : i);
       }
       toast.success(`${item.name} added to cart!`);
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, customizations, cartId, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((i) => i._id !== id));
+  const removeFromCart = (cartId) => {
+    setCartItems((prev) => prev.filter((i) => i.cartId !== cartId));
   };
 
-  const updateQuantity = (id, quantity) => {
-    if (quantity < 1) return removeFromCart(id);
-    setCartItems((prev) => prev.map((i) => i._id === id ? { ...i, quantity } : i));
+  const updateQuantity = (cartId, quantity) => {
+    if (quantity < 1) return removeFromCart(cartId);
+    setCartItems((prev) => prev.map((i) => i.cartId === cartId ? { ...i, quantity } : i));
   };
 
   const clearCart = () => setCartItems([]);

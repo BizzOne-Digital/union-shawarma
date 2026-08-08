@@ -55,4 +55,9 @@ export const deleteGalleryItem = (id) => API.delete(`/gallery/${id}`);
 export const getSettings = () => API.get('/settings');
 export const updateSettings = (data) => API.put('/settings', data, { headers: { 'Content-Type': 'multipart/form-data' } });
 
+// Catering
+export const submitCateringRequest = (data) => API.post('/catering', data);
+export const getCateringRequests = () => API.get('/catering');
+export const updateCateringStatus = (id, data) => API.put(`/catering/${id}/status`, data);
+
 export default API;

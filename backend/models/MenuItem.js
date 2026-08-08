@@ -16,6 +16,14 @@ const menuItemSchema = new mongoose.Schema(
     calories: { type: Number },
     allergens: [{ type: String }],
     order: { type: Number, default: 0 },
+    customizationGroups: [
+      {
+        name: { type: String, required: true }, // e.g. "Base Sauce", "Toppings", "Select Sauces"
+        required: { type: Boolean, default: false },
+        multiSelect: { type: Boolean, default: false },
+        options: [{ type: String, required: true }],
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -5,6 +5,7 @@ const orderItemSchema = new mongoose.Schema({
   name: String,
   price: Number,
   quantity: { type: Number, required: true, min: 1 },
+  customizations: { type: mongoose.Schema.Types.Mixed }, // { "Base Sauce": ["Hummus"], "Toppings": ["Lettuce", "Onion"] }
 });
 
 const orderSchema = new mongoose.Schema(

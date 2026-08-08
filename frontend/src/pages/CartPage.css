@@ -11,6 +11,8 @@
 .cart-item-info { flex: 1; }
 .cart-item-info h3 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
 .cart-item-info p { font-size: 13px; color: var(--gray); }
+.cart-item-customizations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.customization-tag { font-size: 11px; font-weight: 600; color: var(--orange); background: rgba(245, 124, 0, 0.08); padding: 3px 10px; border-radius: 50px; }
 .cart-item-controls { display: flex; align-items: center; gap: 16px; }
 .qty-control { display: flex; align-items: center; gap: 8px; background: var(--gray-light); border-radius: 10px; padding: 6px 10px; }
 .qty-control button { width: 26px; height: 26px; border-radius: 6px; background: white; color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 16px; transition: var(--transition); }

@@ -94,7 +94,14 @@ const AdminOrders = () => {
                 <div className="order-items-list">
                   {order.items?.map((item, idx) => (
                     <div key={idx} className="order-item-row">
-                      <span>{item.name || item.menuItem?.name}</span>
+                      <div>
+                        <span>{item.name || item.menuItem?.name}</span>
+                        {item.customizations && Object.keys(item.customizations).length > 0 && (
+                          <div className="order-item-customizations">
+                            {Object.values(item.customizations).flat().join(', ')}
+                          </div>
+                        )}
+                      </div>
                       <span>x{item.quantity}</span>
                       <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </div>

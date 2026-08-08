@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
 import { getMenuItems, getCategories } from '../utils/api';
 import { useCart } from '../context/CartContext';
+import CustomizeModal from '../components/common/CustomizeModal';
 import './MenuPage.css';
 
 const MenuPage = () => {
@@ -11,7 +12,21 @@ const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [customizeItem, setCustomizeItem] = useState(null);
   const { addToCart } = useCart();
+
+  const handleAddClick = (item) => {
+    if (item.customizationGroups?.length > 0) {
+      setCustomizeItem(item);
+    } else {
+      addToCart(item);
+    }
+  };
+
+  const handleConfirmCustomization = (selections) => {
+    addToCart(customizeItem, selections);
+    setCustomizeItem(null);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -109,7 +124,7 @@ const MenuPage = () => {
                       <span className="price">${item.price.toFixed(2)}</span>
                       <button
                         className="add-btn"
-                        onClick={() => addToCart(item)}
+                        onClick={() => handleAddClick(item)}
                         disabled={!item.isAvailable}
                         aria-label={`Add ${item.name} to cart`}
                       >
@@ -130,6 +145,14 @@ const MenuPage = () => {
           <p>🎉 <strong>Online Special:</strong> Chicken Shawarma Wrap for just <strong>$7.99</strong> when you order online!</p>
         </div>
       </div>
+
+      {customizeItem && (
+        <CustomizeModal
+          item={customizeItem}
+          onClose={() => setCustomizeItem(null)}
+          onConfirm={handleConfirmCustomization}
+        />
+      )}
     </main>
   );
 };

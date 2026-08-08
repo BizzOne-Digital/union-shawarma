@@ -26,7 +26,7 @@ const CheckoutPage = () => {
     setPlacing(true);
     try {
       const orderData = {
-        items: cartItems.map(i => ({ menuItem: i._id, name: i.name, price: i.price, quantity: i.quantity })),
+        items: cartItems.map(i => ({ menuItem: i._id, name: i.name, price: i.price, quantity: i.quantity, customizations: i.customizations })),
         totalAmount: total,
         orderType,
         specialInstructions,
@@ -100,9 +100,16 @@ const CheckoutPage = () => {
             <h3>Order Summary</h3>
             <div style={{ marginBottom: '20px' }}>
               {cartItems.map(item => (
-                <div key={item._id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
-                  <span>{item.name} x{item.quantity}</span>
-                  <span style={{ fontWeight: '600' }}>${(item.price * item.quantity).toFixed(2)}</span>
+                <div key={item.cartId} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>{item.name} x{item.quantity}</span>
+                    <span style={{ fontWeight: '600' }}>${(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                  {item.customizations && Object.keys(item.customizations).length > 0 && (
+                    <div style={{ fontSize: '11px', color: 'var(--gray)', marginTop: '2px' }}>
+                      {Object.values(item.customizations).flat().join(', ')}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
