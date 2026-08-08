@@ -10,11 +10,12 @@ const createOrder = async (req, res) => {
     guestName, guestEmail, guestPhone,
     items, totalAmount, orderType, specialInstructions,
   });
+  console.log(`[order] Created order ${order._id} — $${totalAmount} (${orderType}) — sending email notification...`);
 
   try {
     await sendOrderNotification(order);
   } catch (err) {
-    console.error('Failed to send order notification email:', err.message);
+    console.error(`[order] Email notification failed for order ${order._id}:`, err.message);
   }
 
   res.status(201).json(order);

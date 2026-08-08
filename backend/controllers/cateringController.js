@@ -11,11 +11,12 @@ const createCateringRequest = async (req, res) => {
   }
 
   const request = await CateringRequest.create({ name, email, phone, location, eventDate, guestCount, message });
+  console.log(`[catering] Created request ${request._id} from ${name} — sending email notification...`);
 
   try {
     await sendCateringNotification(request);
   } catch (err) {
-    console.error('Failed to send catering notification email:', err.message);
+    console.error(`[catering] Email notification failed for request ${request._id}:`, err.message);
   }
 
   res.status(201).json(request);
