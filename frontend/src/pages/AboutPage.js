@@ -30,9 +30,9 @@ const AboutPage = () => {
                 <span>🌯 Authentically Delicious</span>
               </div>
             </motion.div>
-            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
-              <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=700&q=80" alt="Our Food" style={{ borderRadius: '24px', width: '100%', height: '480px', objectFit: 'cover', boxShadow: 'var(--shadow-lg)' }} />
-            </motion.div>
+ <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
+              <img src="/newabout.jpg" alt="Our Food" style={{ borderRadius: '24px', width: '100%', height: '480px', objectFit: 'cover', boxShadow: 'var(--shadow-lg)' }} />
+            </motion.div>         
           </div>
         </div>
       </section>

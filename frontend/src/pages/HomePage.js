@@ -94,7 +94,7 @@ const HomePage = () => {
           <div className="hero-shape-1"></div>
           <div className="hero-shape-2"></div>
         </div>
-        <div className="hero-bg-img hero-bg-img-desktop" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/hero.png)` }}></div>
+        <div className="hero-bg-img hero-bg-img-desktop" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/newhero.jpg)` }}></div>
         <div className="hero-bg-img hero-bg-img-mobile" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/mobile-hero2.png)` }}></div>
         <div className="container">
           <div className="hero-inner">
@@ -204,7 +204,7 @@ const HomePage = () => {
               <Link to="/about" className="btn btn-primary">Read Our Story <ArrowRight size={18} /></Link>
             </motion.div>
             <motion.div className="story-img-wrapper" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
-              <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80" alt="Our kitchen" loading="lazy" />
+                <img src="/newabout.jpg"alt="Our kitchen" loading="lazy" />
             </motion.div>
           </div>
         </div>
