@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Flame, Leaf, Truck, Star, ArrowRight, Plus, ShoppingBag } from 'lucide-react';
-import { getMenuItems } from '../utils/api';
+import { getMenuItems, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
 import './HomePage.css';
@@ -57,16 +57,19 @@ const HomePage = () => {
   const [popularItems, setPopularItems] = useState([]);
   const [mustTryItems, setMustTryItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deliveryPartners, setDeliveryPartners] = useState({});
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [popRes, mustRes] = await Promise.all([
+        const [popRes, mustRes, settingsRes] = await Promise.all([
           getMenuItems({ popular: 'true' }),
           getMenuItems({ mustTry: 'true' }),
+          getSettings(),
         ]);
         setPopularItems(popRes.data.slice(0, 3));
         setMustTryItems(mustRes.data.slice(0, 3));
+        setDeliveryPartners(settingsRes.data?.deliveryPartners || {});
       } catch (err) {
         console.error(err);
       } finally {
@@ -224,11 +227,15 @@ const HomePage = () => {
                 </div>
               </div>
               <div className="delivery-partners">
-                {['Uber Eats', 'DoorDash', 'Skip the Dishes'].map(p => (
-                  <div key={p} className="partner-badge">
-                    <span>{p}</span>
+                {[
+                  { label: 'Uber Eats', href: deliveryPartners.uberEats },
+                  { label: 'DoorDash', href: deliveryPartners.doordash },
+                  { label: 'Skip the Dishes', href: deliveryPartners.skipTheDishes },
+                ].filter(p => p.href).map(p => (
+                  <a key={p.label} href={p.href} target="_blank" rel="noreferrer" className="partner-badge">
+                    <span>{p.label}</span>
                     <small>Delivered to your door</small>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>

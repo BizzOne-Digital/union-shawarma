@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock, Instagram, Facebook } from 'lucide-react';
+import { getSettings } from '../../utils/api';
 import './Footer.css';
 
 const Footer = () => {
+  const [deliveryPartners, setDeliveryPartners] = useState({});
+
+  useEffect(() => {
+    getSettings().then((res) => setDeliveryPartners(res.data?.deliveryPartners || {})).catch(() => {});
+  }, []);
+
   const hours = [
     { day: 'Mon – Thu', time: '11:30 AM – 9:00 PM' },
     { day: 'Friday', time: '11:30 AM – 12:00 AM' },
@@ -32,9 +39,15 @@ const Footer = () => {
               <div className="footer-delivery">
                 <p style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Also Available On</p>
                 <div className="delivery-logos">
-                  <span className="delivery-badge">Uber Eats</span>
-                  <span className="delivery-badge">DoorDash</span>
-                  <span className="delivery-badge">Skip</span>
+                  {[
+                    { label: 'Uber Eats', href: deliveryPartners.uberEats },
+                    { label: 'DoorDash', href: deliveryPartners.doordash },
+                    { label: 'Skip', href: deliveryPartners.skipTheDishes },
+                  ].map((p) => (
+                    p.href
+                      ? <a key={p.label} href={p.href} target="_blank" rel="noreferrer" className="delivery-badge">{p.label}</a>
+                      : <span key={p.label} className="delivery-badge">{p.label}</span>
+                  ))}
                 </div>
               </div>
             </div>

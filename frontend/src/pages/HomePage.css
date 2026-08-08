@@ -275,7 +275,7 @@
 .delivery-option strong { display: block; font-size: 15px; font-weight: 700; color: var(--dark); }
 .delivery-option span { font-size: 13px; color: var(--gray); }
 .delivery-partners { display: flex; gap: 12px; flex-wrap: wrap; }
-.partner-badge { text-align: center; padding: 14px 20px; border-radius: 14px; border: 2px solid var(--border); transition: var(--transition); cursor: pointer; }
+.partner-badge { display: inline-block; text-align: center; padding: 14px 20px; border-radius: 14px; border: 2px solid var(--border); transition: var(--transition); cursor: pointer; }
 .partner-badge:hover { border-color: var(--orange); background: rgba(245,124,0,0.04); }
 .partner-badge span { display: block; font-weight: 700; font-size: 14px; color: var(--dark); }
 .partner-badge small { display: block; font-size: 11px; color: var(--gray); margin-top: 2px; }
