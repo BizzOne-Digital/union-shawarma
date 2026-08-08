@@ -33,7 +33,7 @@ const ContactPage = () => {
                   onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.background = 'rgba(245,124,0,0.04)'; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'white'; }}>
                   <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(245,124,0,0.1)', color: 'var(--orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{c.icon}</div>
-                  <div><p style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '2px' }}>{c.label}</p><strong style={{ fontSize: '14px' }}>{c.value}</strong></div>
+                  <div style={{ minWidth: 0 }}><p style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '2px' }}>{c.label}</p><strong style={{ fontSize: '14px', wordBreak: 'break-word' }}>{c.value}</strong></div>
                 </a>
               ))}
             </div>
@@ -41,7 +41,7 @@ const ContactPage = () => {
             <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: '28px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
               <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><Clock size={18} style={{ color: 'var(--orange)' }} /> Hours of Operation</h3>
               {hours.map((h, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < hours.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                <div key={i} className="hours-row" style={{ borderBottom: i < hours.length - 1 ? '1px solid var(--border)' : 'none' }}>
                   <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--dark)' }}>{h.day}</span>
                   <span style={{ fontSize: '14px', color: 'var(--orange)', fontWeight: '700' }}>{h.time}</span>
                 </div>
