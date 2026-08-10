@@ -232,7 +232,7 @@ const HomePage = () => {
                   { label: 'DoorDash', href: deliveryPartners.doordash },
                   { label: 'Skip the Dishes', href: deliveryPartners.skipTheDishes },
                 ].filter(p => p.href).map(p => (
-                  <a key={p.label} href={p.href} className="partner-badge">
+                  <a key={p.label} href={p.href} rel="noreferrer" className="partner-badge">
                     <span>{p.label}</span>
                     <small>Delivered to your door</small>
                   </a>
