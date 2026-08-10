@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ShoppingBag, MapPin, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingBag, MapPin, Clock, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createOrder } from '../utils/api';
+import { createOrder, getSettings } from '../utils/api';
 import toast from 'react-hot-toast';
 import './CartPage.css';
 
@@ -16,6 +16,12 @@ const CheckoutPage = () => {
   const [specialInstructions, setSpecialInstructions] = useState('');
   const [guestInfo, setGuestInfo] = useState({ name: '', email: '', phone: '' });
   const [placing, setPlacing] = useState(false);
+  const [deliveryPartners, setDeliveryPartners] = useState({});
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+
+  useEffect(() => {
+    getSettings().then((res) => setDeliveryPartners(res.data?.deliveryPartners || {})).catch(() => {});
+  }, []);
 
   const tax = totalPrice * 0.13;
   const total = totalPrice + tax;
@@ -60,7 +66,7 @@ const CheckoutPage = () => {
                   { val: 'pickup', label: 'Pickup', icon: <ShoppingBag size={18} />, sub: 'Ready in 15–20 min' },
                   { val: 'delivery', label: 'Delivery', icon: <MapPin size={18} />, sub: 'Via Uber Eats / DoorDash' },
                 ].map(opt => (
-                  <div key={opt.val} onClick={() => setOrderType(opt.val)}
+                  <div key={opt.val} onClick={() => opt.val === 'delivery' ? setShowDeliveryModal(true) : setOrderType(opt.val)}
                     style={{ flex: 1, border: `2px solid ${orderType === opt.val ? 'var(--orange)' : 'var(--border)'}`, borderRadius: '12px', padding: '16px', cursor: 'pointer', background: orderType === opt.val ? 'rgba(245,124,0,0.04)' : 'white', transition: 'all 0.2s' }}>
                     <div style={{ color: 'var(--orange)', marginBottom: '6px' }}>{opt.icon}</div>
                     <strong style={{ display: 'block', fontSize: '15px' }}>{opt.label}</strong>
@@ -130,6 +136,42 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showDeliveryModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+            onClick={() => setShowDeliveryModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              style={{ position: 'relative', background: 'white', borderRadius: '20px', maxWidth: '400px', width: '100%', padding: '32px', textAlign: 'center' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button onClick={() => setShowDeliveryModal(false)} style={{ position: 'absolute', top: '16px', right: '16px', width: '32px', height: '32px', borderRadius: '50%', background: 'var(--gray-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dark)' }}>
+                <X size={18} />
+              </button>
+              <MapPin size={32} style={{ color: 'var(--orange)', marginBottom: '12px' }} />
+              <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '10px' }}>We Don't Deliver Directly — Yet!</h3>
+              <p style={{ fontSize: '14px', color: 'var(--gray)', marginBottom: '24px', lineHeight: '1.6' }}>
+                We don't have our own delivery service yet, but you can order for delivery through one of our partners below.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'Order on Uber Eats', href: deliveryPartners.uberEats },
+                  { label: 'Order on DoorDash', href: deliveryPartners.doordash },
+                  { label: 'Order on Skip the Dishes', href: deliveryPartners.skipTheDishes },
+                ].filter(p => p.href).map(p => (
+                  <a key={p.label} href={p.href} rel="noreferrer" className="btn btn-primary" style={{ justifyContent: 'center' }}>
+                    {p.label}
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 };
