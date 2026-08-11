@@ -270,7 +270,8 @@
 .delivery-text h2 { font-family: var(--font-display); font-size: 28px; font-weight: 800; margin-bottom: 6px; }
 .delivery-text p { color: var(--gray); }
 .delivery-options { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-.delivery-option { display: flex; align-items: center; gap: 16px; padding: 20px 28px; border-radius: 16px; background: rgba(245,124,0,0.06); border: 2px solid rgba(245,124,0,0.15); }
+.delivery-option { display: flex; align-items: center; gap: 16px; padding: 20px 28px; border-radius: 16px; background: rgba(245,124,0,0.06); border: 2px solid rgba(245,124,0,0.15); transition: var(--transition); }
+.delivery-option:hover { border-color: var(--orange); background: rgba(245,124,0,0.1); }
 .delivery-option svg { color: var(--orange); }
 .delivery-option strong { display: block; font-size: 15px; font-weight: 700; color: var(--dark); }
 .delivery-option span { font-size: 13px; color: var(--gray); }

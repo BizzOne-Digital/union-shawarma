@@ -59,14 +59,17 @@ const ContactPage = () => {
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}>
             <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: '36px', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', marginBottom: '24px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '24px' }}>Follow Us</h3>
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 {[
                   { icon: <Instagram size={20} />, label: '@Theunionshawarma', href: 'https://www.instagram.com/theunionshawarma', color: '#E1306C' },
                   { icon: <Facebook size={20} />, label: 'Facebook', href: socialLinks.facebook || 'https://www.facebook.com', color: '#1877F2' },
                 ].map((s, i) => (
                   <a key={i} href={s.href} target="_blank" rel="noreferrer"
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', color: 'var(--dark)', transition: 'all 0.2s', fontWeight: '600', fontSize: '14px' }}>
-                    <span style={{ color: s.color }}>{s.icon}</span>{s.label}
+                    style={{ flex: '1 1 140px', minWidth: 0, display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'white', color: 'var(--dark)', transition: 'all 0.2s', fontWeight: '600', fontSize: '14px' }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor = s.color; e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+                    onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'white'; }}>
+                    <span style={{ color: s.color, flexShrink: 0 }}>{s.icon}</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</span>
                   </a>
                 ))}
               </div>

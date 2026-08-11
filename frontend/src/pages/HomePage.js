@@ -219,13 +219,13 @@ const HomePage = () => {
               <p>Choose the service that works best for you.</p>
             </div>
             <div className="delivery-options">
-              <div className="delivery-option pickup">
+              <Link to="/menu" className="delivery-option pickup">
                 <ShoppingBag size={28} />
                 <div>
                   <strong>Online Pickup</strong>
                   <span>Pick up fresh and fast</span>
                 </div>
-              </div>
+              </Link>
               <div className="delivery-partners">
                 {[
                   { label: 'Uber Eats', href: deliveryPartners.uberEats },

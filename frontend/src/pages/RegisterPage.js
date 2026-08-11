@@ -23,7 +23,7 @@ const RegisterPage = () => {
     <main className="auth-page">
       <div className="auth-bg">
         <div className="auth-img-side">
-          <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80" alt="Food" />
+          <img src="/hero.png" alt="Shawarma" />
           <div className="auth-img-overlay">
             <div className="auth-quote">
               <h2>Join The Union Family</h2>
