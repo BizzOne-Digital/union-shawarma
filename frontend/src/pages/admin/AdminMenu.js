@@ -11,6 +11,8 @@ const EMPTY_FORM = {
   calories: '', allergens: '', order: 0,
 };
 
+const EMPTY_GROUP = { name: '', required: true, multiSelect: false, options: [] };
+
 const AdminMenu = () => {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -18,6 +20,7 @@ const AdminMenu = () => {
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [customizationGroups, setCustomizationGroups] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [saving, setSaving] = useState(false);
@@ -35,7 +38,7 @@ const AdminMenu = () => {
 
   useEffect(() => { load(); }, []);
 
-  const openAdd = () => { setEditItem(null); setForm(EMPTY_FORM); setImageFile(null); setImagePreview(''); setShowModal(true); };
+  const openAdd = () => { setEditItem(null); setForm(EMPTY_FORM); setCustomizationGroups([]); setImageFile(null); setImagePreview(''); setShowModal(true); };
   const openEdit = (item) => {
     setEditItem(item);
     setForm({
@@ -44,10 +47,16 @@ const AdminMenu = () => {
       isFeatured: item.isFeatured, isPopular: item.isPopular, isMustTry: item.isMustTry,
       calories: item.calories || '', allergens: item.allergens?.join(', ') || '', order: item.order || 0,
     });
+    setCustomizationGroups(item.customizationGroups?.map(g => ({ ...g, options: [...g.options] })) || []);
     setImagePreview(item.image || '');
     setImageFile(null);
     setShowModal(true);
   };
+
+  const addGroup = () => setCustomizationGroups(prev => [...prev, { ...EMPTY_GROUP }]);
+  const removeGroup = (idx) => setCustomizationGroups(prev => prev.filter((_, i) => i !== idx));
+  const updateGroup = (idx, field, value) => setCustomizationGroups(prev => prev.map((g, i) => i === idx ? { ...g, [field]: value } : g));
+  const updateGroupOptions = (idx, optionsStr) => updateGroup(idx, 'options', optionsStr.split(',').map(s => s.trim()).filter(Boolean));
 
   const handleImage = (e) => {
     const file = e.target.files[0];
@@ -65,6 +74,8 @@ const AdminMenu = () => {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (form.allergens) fd.set('allergens', JSON.stringify(form.allergens.split(',').map(s => s.trim()).filter(Boolean)));
       else fd.set('allergens', JSON.stringify([]));
+      const cleanGroups = customizationGroups.filter(g => g.name.trim() && g.options.length > 0);
+      fd.set('customizationGroups', JSON.stringify(cleanGroups));
       if (imageFile) fd.append('image', imageFile);
 
       if (editItem) {
@@ -215,6 +226,48 @@ const AdminMenu = () => {
                   <label>Allergens (comma-separated)</label>
                   <input className="form-control" value={form.allergens} onChange={e => setForm({...form, allergens: e.target.value})} placeholder="e.g. gluten, dairy, sesame" />
                 </div>
+
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>Customization Options (sauces, toppings, etc.)</span>
+                    <button type="button" className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '12px' }} onClick={addGroup}>
+                      <Plus size={14} /> Add Group
+                    </button>
+                  </label>
+                  {customizationGroups.length === 0 && <p style={{ fontSize: '12px', color: 'var(--gray)' }}>No customization groups yet. Click "Add Group" to add sauces/toppings customers must choose from.</p>}
+                  {customizationGroups.map((group, idx) => (
+                    <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: '10px', padding: '12px', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          className="form-control"
+                          placeholder="Group name (e.g. Select Sauces)"
+                          value={group.name}
+                          onChange={e => updateGroup(idx, 'name', e.target.value)}
+                          style={{ flex: 1 }}
+                        />
+                        <button type="button" className="action-btn delete" onClick={() => removeGroup(idx)}><Trash2 size={16} /></button>
+                      </div>
+                      <input
+                        className="form-control"
+                        placeholder="Options, comma-separated (e.g. Hot Sauce, Chipotle Sauce, No Sauce)"
+                        value={group.options.join(', ')}
+                        onChange={e => updateGroupOptions(idx, e.target.value)}
+                        style={{ marginBottom: '8px' }}
+                      />
+                      <div style={{ display: 'flex', gap: '16px' }}>
+                        <label className="checkbox-label">
+                          <input type="checkbox" checked={group.required} onChange={e => updateGroup(idx, 'required', e.target.checked)} />
+                          Required
+                        </label>
+                        <label className="checkbox-label">
+                          <input type="checkbox" checked={group.multiSelect} onChange={e => updateGroup(idx, 'multiSelect', e.target.checked)} />
+                          Allow multiple selections
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 <div className="form-group">
                   <label>Image</label>
                   <div className="upload-zone" onClick={() => document.getElementById('menuImg').click()}>

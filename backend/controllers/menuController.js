@@ -35,12 +35,13 @@ const getMenuItemById = async (req, res) => {
 // @desc Create menu item
 // @route POST /api/menu
 const createMenuItem = async (req, res) => {
-  const { name, description, price, category, tags, isAvailable, isFeatured, isPopular, isMustTry, calories, allergens, order } = req.body;
+  const { name, description, price, category, tags, isAvailable, isFeatured, isPopular, isMustTry, calories, allergens, order, customizationGroups } = req.body;
 
   const item = new MenuItem({
     name, description, price, category,
     tags: tags ? JSON.parse(tags) : [],
     allergens: allergens ? JSON.parse(allergens) : [],
+    customizationGroups: customizationGroups ? JSON.parse(customizationGroups) : [],
     isAvailable, isFeatured, isPopular, isMustTry, calories, order,
     image: req.file ? req.file.path : undefined,
     imagePublicId: req.file ? req.file.filename : undefined,
@@ -65,6 +66,7 @@ const updateMenuItem = async (req, res) => {
   fields.forEach(f => { if (req.body[f] !== undefined) item[f] = req.body[f]; });
   if (req.body.tags) item.tags = JSON.parse(req.body.tags);
   if (req.body.allergens) item.allergens = JSON.parse(req.body.allergens);
+  if (req.body.customizationGroups) item.customizationGroups = JSON.parse(req.body.customizationGroups);
   if (req.file) {
     item.image = req.file.path;
     item.imagePublicId = req.file.filename;
