@@ -23,24 +23,29 @@ const createCloverCheckout = async (req, res) => {
     price: Math.round(i.price * 100), // Clover expects cents
   }));
 
+  // Reconcile with totalAmount (which includes tax) by adding the remainder as its own line item
+  const itemsSubtotalCents = lineItems.reduce((sum, li) => sum + li.price * li.unitQty, 0);
+  const totalCents = Math.round(totalAmount * 100);
+  const taxCents = totalCents - itemsSubtotalCents;
+  if (taxCents > 0) {
+    lineItems.push({ name: 'Tax', unitQty: 1, price: taxCents });
+  }
+
   try {
     const { data } = await axios.post(
       `${getCloverBaseUrl()}/invoicingcheckoutservice/v1/checkouts`,
       {
-        merchantId: process.env.CLOVER_MERCHANT_ID,
-        shoppingCart: {
-          lineItems,
-          total: Math.round(totalAmount * 100),
-        },
+        customer: {},
+        shoppingCart: { lineItems },
         redirectUrls: {
           success: successUrl,
           failure: cancelUrl,
-          cancel: cancelUrl,
         },
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.CLOVER_API_TOKEN}`,
+          'X-Clover-Merchant-Id': process.env.CLOVER_MERCHANT_ID,
           'Content-Type': 'application/json',
         },
       }
@@ -72,7 +77,12 @@ const confirmCloverPayment = async (req, res) => {
   try {
     const { data } = await axios.get(
       `${getCloverBaseUrl()}/invoicingcheckoutservice/v1/checkouts/${order.cloverCheckoutSessionId}`,
-      { headers: { Authorization: `Bearer ${process.env.CLOVER_API_TOKEN}` } }
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.CLOVER_API_TOKEN}`,
+          'X-Clover-Merchant-Id': process.env.CLOVER_MERCHANT_ID,
+        },
+      }
     );
 
     const wasAlreadyPaid = order.paymentStatus === 'paid';
