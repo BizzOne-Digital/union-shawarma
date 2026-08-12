@@ -115,7 +115,7 @@ const AdminOrders = () => {
 
               <div className="order-card-footer">
                 <span className="order-total">Total: <strong>${order.totalAmount?.toFixed(2)}</strong></span>
-                <span className={`payment-status ${order.paymentStatus}`}>{order.paymentStatus}</span>
+                <span className={`payment-status ${order.paymentStatus}`}>{order.paymentStatus} · {order.paymentMethod === 'clover' ? 'Online' : 'Cash'}</span>
               </div>
             </motion.div>
           ))}

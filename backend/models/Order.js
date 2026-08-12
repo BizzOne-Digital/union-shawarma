@@ -23,6 +23,8 @@ const orderSchema = new mongoose.Schema(
     },
     orderType: { type: String, enum: ['pickup', 'delivery'], default: 'pickup' },
     paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
+    paymentMethod: { type: String, enum: ['cash', 'clover'], default: 'cash' },
+    cloverCheckoutSessionId: String,
     specialInstructions: String,
     estimatedTime: Number, // minutes
   },

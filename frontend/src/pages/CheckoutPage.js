@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, MapPin, Clock, X } from 'lucide-react';
+import { ShoppingBag, MapPin, Clock, X, CreditCard, Banknote } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createOrder, getSettings } from '../utils/api';
+import { createOrder, getSettings, createCloverCheckout } from '../utils/api';
 import toast from 'react-hot-toast';
 import './CartPage.css';
 
@@ -13,6 +13,7 @@ const CheckoutPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [orderType, setOrderType] = useState('pickup');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [specialInstructions, setSpecialInstructions] = useState('');
   const [guestInfo, setGuestInfo] = useState({ name: '', email: '', phone: '' });
   const [placing, setPlacing] = useState(false);
@@ -36,9 +37,24 @@ const CheckoutPage = () => {
         totalAmount: total,
         orderType,
         specialInstructions,
+        paymentMethod,
         ...(user ? {} : { guestName: guestInfo.name, guestEmail: guestInfo.email, guestPhone: guestInfo.phone }),
       };
-      await createOrder(orderData);
+      const { data: order } = await createOrder(orderData);
+
+      if (paymentMethod === 'clover') {
+        const returnBase = `${window.location.origin}/order-confirmation?orderId=${order._id}`;
+        const { data: checkout } = await createCloverCheckout({
+          orderId: order._id,
+          items: cartItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+          totalAmount: total,
+          successUrl: returnBase,
+          cancelUrl: `${returnBase}&status=cancelled`,
+        });
+        window.location.href = checkout.href;
+        return;
+      }
+
       clearCart();
       toast.success('Order placed! We will confirm shortly.');
       navigate('/');
@@ -68,6 +84,24 @@ const CheckoutPage = () => {
                 ].map(opt => (
                   <div key={opt.val} onClick={() => opt.val === 'delivery' ? setShowDeliveryModal(true) : setOrderType(opt.val)}
                     style={{ flex: 1, border: `2px solid ${orderType === opt.val ? 'var(--orange)' : 'var(--border)'}`, borderRadius: '12px', padding: '16px', cursor: 'pointer', background: orderType === opt.val ? 'rgba(245,124,0,0.04)' : 'white', transition: 'all 0.2s' }}>
+                    <div style={{ color: 'var(--orange)', marginBottom: '6px' }}>{opt.icon}</div>
+                    <strong style={{ display: 'block', fontSize: '15px' }}>{opt.label}</strong>
+                    <small style={{ color: 'var(--gray)' }}>{opt.sub}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Payment Method */}
+            <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: '24px', marginBottom: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+              <h3 style={{ fontWeight: '700', marginBottom: '16px', fontSize: '17px' }}>How would you like to pay?</h3>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                {[
+                  { val: 'cash', label: 'Pay at Pickup', icon: <Banknote size={18} />, sub: 'Cash or card in-store' },
+                  { val: 'clover', label: 'Pay Online Now', icon: <CreditCard size={18} />, sub: 'Secure card checkout' },
+                ].map(opt => (
+                  <div key={opt.val} onClick={() => setPaymentMethod(opt.val)}
+                    style={{ flex: 1, border: `2px solid ${paymentMethod === opt.val ? 'var(--orange)' : 'var(--border)'}`, borderRadius: '12px', padding: '16px', cursor: 'pointer', background: paymentMethod === opt.val ? 'rgba(245,124,0,0.04)' : 'white', transition: 'all 0.2s' }}>
                     <div style={{ color: 'var(--orange)', marginBottom: '6px' }}>{opt.icon}</div>
                     <strong style={{ display: 'block', fontSize: '15px' }}>{opt.label}</strong>
                     <small style={{ color: 'var(--gray)' }}>{opt.sub}</small>
@@ -128,10 +162,10 @@ const CheckoutPage = () => {
               <Clock size={14} /> Estimated wait: 15–25 minutes
             </div>
             <button className="btn btn-primary w-full" style={{ justifyContent: 'center' }} onClick={handlePlaceOrder} disabled={placing}>
-              {placing ? 'Placing Order...' : `Place Order — $${total.toFixed(2)}`}
+              {placing ? 'Processing...' : paymentMethod === 'clover' ? `Continue to Payment — $${total.toFixed(2)}` : `Place Order — $${total.toFixed(2)}`}
             </button>
             <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--gray)', marginTop: '12px' }}>
-              Payment collected at pickup / via delivery partner
+              {paymentMethod === 'clover' ? "You'll be redirected to our secure payment page." : 'Payment collected at pickup.'}
             </p>
           </div>
         </div>

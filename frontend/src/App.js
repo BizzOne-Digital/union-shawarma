@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 
 // Customer Pages
 import ProfilePage from './pages/customer/ProfilePage';
@@ -72,6 +73,7 @@ function AppRoutes() {
       <Route path="/register" element={<PublicLayout><RegisterPage /></PublicLayout>} />
       <Route path="/cart" element={<PublicLayout><CartPage /></PublicLayout>} />
       <Route path="/checkout" element={<PublicLayout><CheckoutPage /></PublicLayout>} />
+      <Route path="/order-confirmation" element={<PublicLayout><OrderConfirmationPage /></PublicLayout>} />
 
       {/* Customer */}
       <Route path="/profile" element={<ProtectedRoute><PublicLayout><ProfilePage /></PublicLayout></ProtectedRoute>} />

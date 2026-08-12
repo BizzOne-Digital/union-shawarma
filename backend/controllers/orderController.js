@@ -2,23 +2,33 @@ const Order = require('../models/Order');
 const { sendOrderNotification } = require('../utils/sendEmail');
 
 const createOrder = async (req, res) => {
-  const { items, totalAmount, orderType, specialInstructions, guestName, guestEmail, guestPhone } = req.body;
+  const { items, totalAmount, orderType, specialInstructions, guestName, guestEmail, guestPhone, paymentMethod } = req.body;
   if (!items || items.length === 0) return res.status(400).json({ message: 'No order items' });
 
   const order = await Order.create({
     user: req.user ? req.user._id : undefined,
     guestName, guestEmail, guestPhone,
     items, totalAmount, orderType, specialInstructions,
+    paymentMethod: paymentMethod === 'clover' ? 'clover' : 'cash',
   });
-  console.log(`[order] Created order ${order._id} — $${totalAmount} (${orderType}) — sending email notification...`);
+  console.log(`[order] Created order ${order._id} — $${totalAmount} (${orderType}, ${order.paymentMethod})`);
 
-  try {
-    await sendOrderNotification(order);
-  } catch (err) {
-    console.error(`[order] Email notification failed for order ${order._id}:`, err.message);
+  // For online payments, hold the notification until the payment is actually confirmed
+  if (order.paymentMethod !== 'clover') {
+    try {
+      await sendOrderNotification(order);
+    } catch (err) {
+      console.error(`[order] Email notification failed for order ${order._id}:`, err.message);
+    }
   }
 
   res.status(201).json(order);
+};
+
+const getOrderById = async (req, res) => {
+  const order = await Order.findById(req.params.id).populate('items.menuItem', 'name image');
+  if (!order) return res.status(404).json({ message: 'Order not found' });
+  res.json(order);
 };
 
 const getMyOrders = async (req, res) => {
@@ -67,4 +77,4 @@ const getOrderStats = async (req, res) => {
   });
 };
 
-module.exports = { createOrder, getMyOrders, getAllOrders, updateOrderStatus, getOrderStats };
+module.exports = { createOrder, getOrderById, getMyOrders, getAllOrders, updateOrderStatus, getOrderStats };

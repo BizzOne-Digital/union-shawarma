@@ -60,4 +60,9 @@ export const submitCateringRequest = (data) => API.post('/catering', data);
 export const getCateringRequests = () => API.get('/catering');
 export const updateCateringStatus = (id, data) => API.put(`/catering/${id}/status`, data);
 
+// Payments (Clover)
+export const createCloverCheckout = (data) => API.post('/payments/clover/checkout', data);
+export const confirmCloverPayment = (data) => API.post('/payments/clover/confirm', data);
+export const getOrder = (id) => API.get(`/orders/${id}`);
+
 export default API;
