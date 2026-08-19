@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, MapPin, Clock, X, CreditCard, Banknote } from 'lucide-react';
+import { ShoppingBag, MapPin, Clock, X, CreditCard, Banknote, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createOrder, getSettings, createCloverCheckout } from '../utils/api';
+import { createOrder, getSettings, createCloverCheckout, validateCoupon } from '../utils/api';
 import toast from 'react-hot-toast';
 import './CartPage.css';
 
@@ -19,13 +19,35 @@ const CheckoutPage = () => {
   const [placing, setPlacing] = useState(false);
   const [deliveryPartners, setDeliveryPartners] = useState({});
   const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     getSettings().then((res) => setDeliveryPartners(res.data?.deliveryPartners || {})).catch(() => {});
   }, []);
 
-  const tax = totalPrice * 0.13;
-  const total = totalPrice + tax;
+  const discount = appliedCoupon?.discount || 0;
+  const discountedSubtotal = Math.max(0, totalPrice - discount);
+  const tax = discountedSubtotal * 0.13;
+  const total = discountedSubtotal + tax;
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    try {
+      const { data } = await validateCoupon({ code: couponInput.trim(), subtotal: totalPrice });
+      setAppliedCoupon(data);
+      toast.success(`Coupon "${data.code}" applied!`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid coupon code');
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => { setAppliedCoupon(null); setCouponInput(''); };
 
   const handlePlaceOrder = async () => {
     if (cartItems.length === 0) return toast.error('Your cart is empty');
@@ -38,6 +60,8 @@ const CheckoutPage = () => {
         orderType,
         specialInstructions,
         paymentMethod,
+        couponCode: appliedCoupon?.code,
+        discountAmount: discount,
         ...(user ? {} : { guestName: guestInfo.name, guestEmail: guestInfo.email, guestPhone: guestInfo.phone }),
       };
       const { data: order } = await createOrder(orderData);
@@ -153,8 +177,30 @@ const CheckoutPage = () => {
                 </div>
               ))}
             </div>
+            <div className="coupon-box">
+              {appliedCoupon ? (
+                <div className="coupon-applied">
+                  <span><Tag size={14} /> <strong>{appliedCoupon.code}</strong> applied</span>
+                  <button type="button" onClick={handleRemoveCoupon}>Remove</button>
+                </div>
+              ) : (
+                <div className="coupon-input-row">
+                  <input
+                    className="form-control"
+                    placeholder="Coupon code"
+                    value={couponInput}
+                    onChange={e => setCouponInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleApplyCoupon())}
+                  />
+                  <button type="button" className="btn btn-outline" onClick={handleApplyCoupon} disabled={couponLoading}>
+                    {couponLoading ? '...' : 'Apply'}
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="summary-rows">
               <div className="summary-row"><span>Subtotal</span><span>${totalPrice.toFixed(2)}</span></div>
+              {discount > 0 && <div className="summary-row" style={{ color: 'var(--orange)' }}><span>Discount ({appliedCoupon.code})</span><span>-${discount.toFixed(2)}</span></div>}
               <div className="summary-row"><span>HST (13%)</span><span>${tax.toFixed(2)}</span></div>
               <div className="summary-row total"><span>Total</span><span>${total.toFixed(2)}</span></div>
             </div>

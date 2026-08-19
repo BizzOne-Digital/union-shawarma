@@ -1,8 +1,9 @@
 const Order = require('../models/Order');
+const Coupon = require('../models/Coupon');
 const { sendOrderNotification } = require('../utils/sendEmail');
 
 const createOrder = async (req, res) => {
-  const { items, totalAmount, orderType, specialInstructions, guestName, guestEmail, guestPhone, paymentMethod } = req.body;
+  const { items, totalAmount, orderType, specialInstructions, guestName, guestEmail, guestPhone, paymentMethod, couponCode, discountAmount } = req.body;
   if (!items || items.length === 0) return res.status(400).json({ message: 'No order items' });
 
   const order = await Order.create({
@@ -10,8 +11,18 @@ const createOrder = async (req, res) => {
     guestName, guestEmail, guestPhone,
     items, totalAmount, orderType, specialInstructions,
     paymentMethod: paymentMethod === 'clover' ? 'clover' : 'cash',
+    couponCode: couponCode || undefined,
+    discountAmount: discountAmount || 0,
   });
   console.log(`[order] Created order ${order._id} — $${totalAmount} (${orderType}, ${order.paymentMethod})`);
+
+  if (couponCode) {
+    try {
+      await Coupon.updateOne({ code: couponCode.trim().toUpperCase() }, { $inc: { usedCount: 1 } });
+    } catch (err) {
+      console.error(`[order] Failed to increment coupon usage for ${couponCode}:`, err.message);
+    }
+  }
 
   // For online payments, hold the notification until the payment is actually confirmed
   if (order.paymentMethod !== 'clover') {

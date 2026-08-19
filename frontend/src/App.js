@@ -31,6 +31,7 @@ import AdminGallery from './pages/admin/AdminGallery';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminCatering from './pages/admin/AdminCatering';
+import AdminCoupons from './pages/admin/AdminCoupons';
 
 // Layout
 import Navbar from './components/common/Navbar';
@@ -88,6 +89,7 @@ function AppRoutes() {
       <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
       <Route path="/admin/gallery" element={<AdminRoute><AdminLayout><AdminGallery /></AdminLayout></AdminRoute>} />
       <Route path="/admin/catering" element={<AdminRoute><AdminLayout><AdminCatering /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/coupons" element={<AdminRoute><AdminLayout><AdminCoupons /></AdminLayout></AdminRoute>} />
       <Route path="/admin/settings" element={<AdminRoute><AdminLayout><AdminSettings /></AdminLayout></AdminRoute>} />
     </Routes>
   );
