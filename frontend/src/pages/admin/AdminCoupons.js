@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Tag } from 'lucide-react';
-import { getCoupons, createCoupon, updateCoupon, deleteCoupon } from '../../utils/api';
+import { getCoupons, createCoupon, updateCoupon, deleteCoupon, getMenuItems } from '../../utils/api';
 import toast from 'react-hot-toast';
 import './AdminOrders.css';
 
-const EMPTY_FORM = { code: '', discountType: 'percent', discountValue: '', minOrderAmount: '', expiresAt: '', usageLimit: '' };
+const EMPTY_FORM = { code: '', discountType: 'percent', discountValue: '', minOrderAmount: '', expiresAt: '', usageLimit: '', applicableItems: [] };
 
 const AdminCoupons = () => {
   const [coupons, setCoupons] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
@@ -15,13 +16,23 @@ const AdminCoupons = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await getCoupons();
-      setCoupons(res.data);
+      const [couponsRes, menuRes] = await Promise.all([getCoupons(), getMenuItems()]);
+      setCoupons(couponsRes.data);
+      setMenuItems(menuRes.data);
     } catch { toast.error('Failed to load coupons'); }
     finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, []);
+
+  const toggleApplicableItem = (id) => {
+    setForm((prev) => ({
+      ...prev,
+      applicableItems: prev.applicableItems.includes(id)
+        ? prev.applicableItems.filter((i) => i !== id)
+        : [...prev.applicableItems, id],
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,6 +46,7 @@ const AdminCoupons = () => {
         minOrderAmount: form.minOrderAmount ? Number(form.minOrderAmount) : 0,
         expiresAt: form.expiresAt || undefined,
         usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
+        applicableItems: form.discountType === 'bogo50' ? form.applicableItems : [],
       });
       toast.success('Coupon created!');
       setForm(EMPTY_FORM);
@@ -102,6 +114,20 @@ const AdminCoupons = () => {
         <button type="submit" className="btn btn-primary" disabled={saving} style={{ justifyContent: 'center' }}>
           <Plus size={16} /> {saving ? 'Saving...' : 'Add Coupon'}
         </button>
+
+        {form.discountType === 'bogo50' && (
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <label>Applies to (leave empty for any item)</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxHeight: '160px', overflowY: 'auto', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px' }}>
+              {menuItems.map((item) => (
+                <label key={item._id} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '4px 10px', borderRadius: '20px', background: form.applicableItems.includes(item._id) ? 'rgba(245,124,0,0.1)' : 'var(--gray-light)', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={form.applicableItems.includes(item._id)} onChange={() => toggleApplicableItem(item._id)} />
+                  {item.name}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </form>
 
       {loading ? (
@@ -117,6 +143,9 @@ const AdminCoupons = () => {
                   <span className="order-id"><Tag size={14} style={{ verticalAlign: 'middle', marginRight: 6 }} />{c.code}</span>
                   <span className="order-date">
                     {c.discountType === 'percent' ? `${c.discountValue}% off` : c.discountType === 'bogo50' ? 'Buy 1 Get 1 50% Off' : `$${c.discountValue} off`}
+                    {c.discountType === 'bogo50' && (c.applicableItems?.length > 0
+                      ? ` · Applies to: ${c.applicableItems.map((id) => menuItems.find((m) => m._id === id)?.name || '—').join(', ')}`
+                      : ' · Applies to: any item')}
                     {c.minOrderAmount > 0 && ` · Min $${c.minOrderAmount}`}
                     {c.expiresAt && ` · Expires ${new Date(c.expiresAt).toLocaleDateString()}`}
                     {' · Used '}{c.usedCount}{c.usageLimit ? `/${c.usageLimit}` : ''}

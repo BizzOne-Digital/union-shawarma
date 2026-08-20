@@ -1,9 +1,12 @@
 const Coupon = require('../models/Coupon');
 
-// Buy-1-get-1-50%-off: for every 2 units of the SAME item in the cart, one unit is half price
-const computeBogoDiscount = (items) => {
+// Buy-1-get-1-50%-off: for every 2 units of the SAME item in the cart, one unit is half price.
+// If the coupon restricts to specific items (applicableItems), only those items qualify.
+const computeBogoDiscount = (items, coupon) => {
   if (!Array.isArray(items)) return 0;
+  const restrictTo = coupon?.applicableItems?.length ? new Set(coupon.applicableItems.map((id) => String(id))) : null;
   return items.reduce((sum, item) => {
+    if (restrictTo && !restrictTo.has(String(item.menuItem))) return sum;
     const pairs = Math.floor((item.quantity || 0) / 2);
     return sum + pairs * (item.price || 0) * 0.5;
   }, 0);
@@ -11,7 +14,7 @@ const computeBogoDiscount = (items) => {
 
 const computeDiscount = (coupon, subtotal, items) => {
   if (coupon.discountType === 'percent') return Math.min(subtotal, (subtotal * coupon.discountValue) / 100);
-  if (coupon.discountType === 'bogo50') return Math.min(subtotal, computeBogoDiscount(items));
+  if (coupon.discountType === 'bogo50') return Math.min(subtotal, computeBogoDiscount(items, coupon));
   return Math.min(subtotal, coupon.discountValue);
 };
 
@@ -29,7 +32,7 @@ const validateCoupon = async (req, res) => {
   if (subtotal < coupon.minOrderAmount) {
     return res.status(400).json({ message: `Minimum order of $${coupon.minOrderAmount.toFixed(2)} required for this coupon` });
   }
-  if (coupon.discountType === 'bogo50' && computeBogoDiscount(items) <= 0) {
+  if (coupon.discountType === 'bogo50' && computeBogoDiscount(items, coupon) <= 0) {
     return res.status(400).json({ message: 'Add 2 or more of the same item to use this coupon' });
   }
 
@@ -40,9 +43,10 @@ const validateCoupon = async (req, res) => {
 // @desc Create a coupon (admin)
 // @route POST /api/coupons
 const createCoupon = async (req, res) => {
-  const { code, discountType, discountValue, minOrderAmount, isActive, expiresAt, usageLimit } = req.body;
+  const { code, discountType, discountValue, minOrderAmount, isActive, expiresAt, usageLimit, applicableItems } = req.body;
   const coupon = await Coupon.create({
     code, discountType, discountValue, minOrderAmount, isActive, expiresAt: expiresAt || undefined, usageLimit: usageLimit || undefined,
+    applicableItems: applicableItems || [],
   });
   res.status(201).json(coupon);
 };
@@ -60,7 +64,7 @@ const updateCoupon = async (req, res) => {
   const coupon = await Coupon.findById(req.params.id);
   if (!coupon) return res.status(404).json({ message: 'Coupon not found' });
 
-  const fields = ['code', 'discountType', 'discountValue', 'minOrderAmount', 'isActive', 'expiresAt', 'usageLimit'];
+  const fields = ['code', 'discountType', 'discountValue', 'minOrderAmount', 'isActive', 'expiresAt', 'usageLimit', 'applicableItems'];
   fields.forEach((f) => { if (req.body[f] !== undefined) coupon[f] = req.body[f]; });
 
   const updated = await coupon.save();

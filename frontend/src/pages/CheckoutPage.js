@@ -39,7 +39,7 @@ const CheckoutPage = () => {
       const { data } = await validateCoupon({
         code: couponInput.trim(),
         subtotal: totalPrice,
-        items: cartItems.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+        items: cartItems.map(i => ({ menuItem: i._id, name: i.name, price: i.price, quantity: i.quantity })),
       });
       setAppliedCoupon(data);
       toast.success(`Coupon "${data.code}" applied!`);
