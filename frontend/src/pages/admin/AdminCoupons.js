@@ -25,13 +25,13 @@ const AdminCoupons = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.code || !form.discountValue) return toast.error('Code and discount value are required');
+    if (!form.code || (form.discountType !== 'bogo50' && !form.discountValue)) return toast.error('Code and discount value are required');
     setSaving(true);
     try {
       await createCoupon({
         code: form.code,
         discountType: form.discountType,
-        discountValue: Number(form.discountValue),
+        discountValue: form.discountType === 'bogo50' ? 0 : Number(form.discountValue),
         minOrderAmount: form.minOrderAmount ? Number(form.minOrderAmount) : 0,
         expiresAt: form.expiresAt || undefined,
         usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
@@ -78,12 +78,15 @@ const AdminCoupons = () => {
           <select className="form-control" value={form.discountType} onChange={e => setForm({ ...form, discountType: e.target.value })}>
             <option value="percent">Percent (%)</option>
             <option value="fixed">Fixed ($)</option>
+            <option value="bogo50">Buy 1 Get 1 50% Off</option>
           </select>
         </div>
-        <div className="form-group">
-          <label>Value *</label>
-          <input className="form-control" type="number" min="0" value={form.discountValue} onChange={e => setForm({ ...form, discountValue: e.target.value })} placeholder="10" />
-        </div>
+        {form.discountType !== 'bogo50' && (
+          <div className="form-group">
+            <label>Value *</label>
+            <input className="form-control" type="number" min="0" value={form.discountValue} onChange={e => setForm({ ...form, discountValue: e.target.value })} placeholder="10" />
+          </div>
+        )}
         <div className="form-group">
           <label>Min Order ($)</label>
           <input className="form-control" type="number" min="0" value={form.minOrderAmount} onChange={e => setForm({ ...form, minOrderAmount: e.target.value })} placeholder="0" />
@@ -113,7 +116,7 @@ const AdminCoupons = () => {
                 <div className="order-id-row">
                   <span className="order-id"><Tag size={14} style={{ verticalAlign: 'middle', marginRight: 6 }} />{c.code}</span>
                   <span className="order-date">
-                    {c.discountType === 'percent' ? `${c.discountValue}% off` : `$${c.discountValue} off`}
+                    {c.discountType === 'percent' ? `${c.discountValue}% off` : c.discountType === 'bogo50' ? 'Buy 1 Get 1 50% Off' : `$${c.discountValue} off`}
                     {c.minOrderAmount > 0 && ` · Min $${c.minOrderAmount}`}
                     {c.expiresAt && ` · Expires ${new Date(c.expiresAt).toLocaleDateString()}`}
                     {' · Used '}{c.usedCount}{c.usageLimit ? `/${c.usageLimit}` : ''}

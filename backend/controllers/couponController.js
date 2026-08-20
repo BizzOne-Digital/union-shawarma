@@ -1,14 +1,24 @@
 const Coupon = require('../models/Coupon');
 
-const computeDiscount = (coupon, subtotal) => {
+// Buy-1-get-1-50%-off: for every 2 units of the SAME item in the cart, one unit is half price
+const computeBogoDiscount = (items) => {
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((sum, item) => {
+    const pairs = Math.floor((item.quantity || 0) / 2);
+    return sum + pairs * (item.price || 0) * 0.5;
+  }, 0);
+};
+
+const computeDiscount = (coupon, subtotal, items) => {
   if (coupon.discountType === 'percent') return Math.min(subtotal, (subtotal * coupon.discountValue) / 100);
+  if (coupon.discountType === 'bogo50') return Math.min(subtotal, computeBogoDiscount(items));
   return Math.min(subtotal, coupon.discountValue);
 };
 
 // @desc Validate a coupon code and return the discount for a given subtotal
 // @route POST /api/coupons/validate
 const validateCoupon = async (req, res) => {
-  const { code, subtotal } = req.body;
+  const { code, subtotal, items } = req.body;
   if (!code) return res.status(400).json({ message: 'Coupon code is required' });
 
   const coupon = await Coupon.findOne({ code: code.trim().toUpperCase() });
@@ -19,8 +29,11 @@ const validateCoupon = async (req, res) => {
   if (subtotal < coupon.minOrderAmount) {
     return res.status(400).json({ message: `Minimum order of $${coupon.minOrderAmount.toFixed(2)} required for this coupon` });
   }
+  if (coupon.discountType === 'bogo50' && computeBogoDiscount(items) <= 0) {
+    return res.status(400).json({ message: 'Add 2 or more of the same item to use this coupon' });
+  }
 
-  const discount = computeDiscount(coupon, subtotal);
+  const discount = computeDiscount(coupon, subtotal, items);
   res.json({ code: coupon.code, discountType: coupon.discountType, discountValue: coupon.discountValue, discount });
 };
 
