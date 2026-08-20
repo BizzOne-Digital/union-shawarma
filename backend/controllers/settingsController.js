@@ -27,8 +27,19 @@ const updateSettings = async (req, res) => {
   let settings = await Settings.findOne();
   if (!settings) settings = new Settings();
 
-  const fields = ['siteName','heroTitle','heroSubtitle','contactInfo','businessHours','socialLinks','deliveryPartners','specialOffer','seoTitle','seoDescription'];
-  fields.forEach(f => { if (req.body[f] !== undefined) settings[f] = req.body[f]; });
+  const stringFields = ['siteName', 'heroTitle', 'heroSubtitle', 'seoTitle', 'seoDescription'];
+  const jsonFields = ['contactInfo', 'businessHours', 'socialLinks', 'deliveryPartners', 'specialOffer'];
+
+  stringFields.forEach(f => { if (req.body[f] !== undefined) settings[f] = req.body[f]; });
+  jsonFields.forEach(f => {
+    if (req.body[f] !== undefined) {
+      try {
+        settings[f] = JSON.parse(req.body[f]);
+      } catch (err) {
+        console.error(`[settings] Failed to parse "${f}":`, err.message);
+      }
+    }
+  });
 
   if (req.file) {
     if (settings.logoPublicId) await cloudinary.uploader.destroy(settings.logoPublicId);
