@@ -1,20 +1,24 @@
 const Coupon = require('../models/Coupon');
 
-// Buy-1-get-1-50%-off: for every 2 units of the SAME item in the cart, one unit is half price.
+const BOGO_FRACTION = { bogo50: 0.5, bogo100: 1 };
+const isBogo = (discountType) => discountType in BOGO_FRACTION;
+
+// Buy-1-get-1-X-off: for every 2 units of the SAME item in the cart, one unit is discounted by the given fraction.
 // If the coupon restricts to specific items (applicableItems), only those items qualify.
 const computeBogoDiscount = (items, coupon) => {
   if (!Array.isArray(items)) return 0;
+  const fraction = BOGO_FRACTION[coupon.discountType] ?? 0;
   const restrictTo = coupon?.applicableItems?.length ? new Set(coupon.applicableItems.map((id) => String(id))) : null;
   return items.reduce((sum, item) => {
     if (restrictTo && !restrictTo.has(String(item.menuItem))) return sum;
     const pairs = Math.floor((item.quantity || 0) / 2);
-    return sum + pairs * (item.price || 0) * 0.5;
+    return sum + pairs * (item.price || 0) * fraction;
   }, 0);
 };
 
 const computeDiscount = (coupon, subtotal, items) => {
   if (coupon.discountType === 'percent') return Math.min(subtotal, (subtotal * coupon.discountValue) / 100);
-  if (coupon.discountType === 'bogo50') return Math.min(subtotal, computeBogoDiscount(items, coupon));
+  if (isBogo(coupon.discountType)) return Math.min(subtotal, computeBogoDiscount(items, coupon));
   return Math.min(subtotal, coupon.discountValue);
 };
 
@@ -32,7 +36,7 @@ const validateCoupon = async (req, res) => {
   if (subtotal < coupon.minOrderAmount) {
     return res.status(400).json({ message: `Minimum order of $${coupon.minOrderAmount.toFixed(2)} required for this coupon` });
   }
-  if (coupon.discountType === 'bogo50' && computeBogoDiscount(items, coupon) <= 0) {
+  if (isBogo(coupon.discountType) && computeBogoDiscount(items, coupon) <= 0) {
     return res.status(400).json({ message: 'Add 2 or more of the same item to use this coupon' });
   }
 

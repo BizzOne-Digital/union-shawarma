@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import './AdminOrders.css';
 
 const EMPTY_FORM = { code: '', discountType: 'percent', discountValue: '', minOrderAmount: '', expiresAt: '', usageLimit: '', applicableItems: [] };
+const BOGO_TYPES = ['bogo50', 'bogo100'];
+const BOGO_LABELS = { bogo50: 'Buy 1 Get 1 50% Off', bogo100: 'Buy 1 Get 1 Free' };
 
 const AdminCoupons = () => {
   const [coupons, setCoupons] = useState([]);
@@ -36,17 +38,17 @@ const AdminCoupons = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.code || (form.discountType !== 'bogo50' && !form.discountValue)) return toast.error('Code and discount value are required');
+    if (!form.code || (!BOGO_TYPES.includes(form.discountType) && !form.discountValue)) return toast.error('Code and discount value are required');
     setSaving(true);
     try {
       await createCoupon({
         code: form.code,
         discountType: form.discountType,
-        discountValue: form.discountType === 'bogo50' ? 0 : Number(form.discountValue),
+        discountValue: BOGO_TYPES.includes(form.discountType) ? 0 : Number(form.discountValue),
         minOrderAmount: form.minOrderAmount ? Number(form.minOrderAmount) : 0,
         expiresAt: form.expiresAt || undefined,
         usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
-        applicableItems: form.discountType === 'bogo50' ? form.applicableItems : [],
+        applicableItems: BOGO_TYPES.includes(form.discountType) ? form.applicableItems : [],
       });
       toast.success('Coupon created!');
       setForm(EMPTY_FORM);
@@ -91,9 +93,10 @@ const AdminCoupons = () => {
             <option value="percent">Percent (%)</option>
             <option value="fixed">Fixed ($)</option>
             <option value="bogo50">Buy 1 Get 1 50% Off</option>
+            <option value="bogo100">Buy 1 Get 1 Free</option>
           </select>
         </div>
-        {form.discountType !== 'bogo50' && (
+        {!BOGO_TYPES.includes(form.discountType) && (
           <div className="form-group">
             <label>Value *</label>
             <input className="form-control" type="number" min="0" value={form.discountValue} onChange={e => setForm({ ...form, discountValue: e.target.value })} placeholder="10" />
@@ -115,7 +118,7 @@ const AdminCoupons = () => {
           <Plus size={16} /> {saving ? 'Saving...' : 'Add Coupon'}
         </button>
 
-        {form.discountType === 'bogo50' && (
+        {BOGO_TYPES.includes(form.discountType) && (
           <div className="form-group" style={{ gridColumn: '1 / -1' }}>
             <label>Applies to (leave empty for any item)</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', maxHeight: '160px', overflowY: 'auto', border: '1px solid var(--border)', borderRadius: '10px', padding: '10px' }}>
@@ -142,8 +145,8 @@ const AdminCoupons = () => {
                 <div className="order-id-row">
                   <span className="order-id"><Tag size={14} style={{ verticalAlign: 'middle', marginRight: 6 }} />{c.code}</span>
                   <span className="order-date">
-                    {c.discountType === 'percent' ? `${c.discountValue}% off` : c.discountType === 'bogo50' ? 'Buy 1 Get 1 50% Off' : `$${c.discountValue} off`}
-                    {c.discountType === 'bogo50' && (c.applicableItems?.length > 0
+                    {c.discountType === 'percent' ? `${c.discountValue}% off` : BOGO_LABELS[c.discountType] ? BOGO_LABELS[c.discountType] : `$${c.discountValue} off`}
+                    {BOGO_TYPES.includes(c.discountType) && (c.applicableItems?.length > 0
                       ? ` · Applies to: ${c.applicableItems.map((id) => menuItems.find((m) => m._id === id)?.name || '—').join(', ')}`
                       : ' · Applies to: any item')}
                     {c.minOrderAmount > 0 && ` · Min $${c.minOrderAmount}`}
