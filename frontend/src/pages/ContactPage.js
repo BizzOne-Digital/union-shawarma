@@ -2,21 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, Clock, Instagram, Facebook, MapPin } from 'lucide-react';
 import { getSettings } from '../utils/api';
+import { groupBusinessHours } from '../utils/formatHours';
 import './ContactPage.css';
+
+const FALLBACK_HOURS = [
+  { day: 'Monday – Thursday', time: '11:30 AM – 9:00 PM' },
+  { day: 'Friday', time: '11:30 AM – 12:00 AM' },
+  { day: 'Saturday', time: '1:00 PM – 12:00 AM' },
+  { day: 'Sunday', time: '1:00 PM – 9:00 PM' },
+];
 
 const ContactPage = () => {
   const [socialLinks, setSocialLinks] = useState({});
+  const [hours, setHours] = useState(FALLBACK_HOURS);
 
   useEffect(() => {
-    getSettings().then((res) => setSocialLinks(res.data?.socialLinks || {})).catch(() => {});
+    getSettings().then((res) => {
+      setSocialLinks(res.data?.socialLinks || {});
+      const grouped = groupBusinessHours(res.data?.businessHours);
+      if (grouped.length > 0) setHours(grouped);
+    }).catch(() => {});
   }, []);
-
-  const hours = [
-    { day: 'Monday – Thursday', time: '11:30 AM – 9:00 PM' },
-    { day: 'Friday', time: '11:30 AM – 12:00 AM' },
-    { day: 'Saturday', time: '1:00 PM – 12:00 AM' },
-    { day: 'Sunday', time: '1:00 PM – 9:00 PM' },
-  ];
 
   return (
     <main style={{ paddingTop: '90px', paddingBottom: '80px' }}>
