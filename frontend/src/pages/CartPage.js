@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getSettings } from '../utils/api';
 import './CartPage.css';
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalItems, totalPrice } = useCart();
   const navigate = useNavigate();
+  const [specialOffer, setSpecialOffer] = useState(null);
+
+  useEffect(() => {
+    getSettings().then((res) => setSpecialOffer(res.data?.specialOffer || null)).catch(() => {});
+  }, []);
 
   if (cartItems.length === 0) {
     return (
@@ -70,7 +76,9 @@ const CartPage = () => {
               <div className="summary-row"><span>Tax (13% HST)</span><span>${(totalPrice * 0.13).toFixed(2)}</span></div>
               <div className="summary-row total"><span>Total</span><span>${(totalPrice * 1.13).toFixed(2)}</span></div>
             </div>
-            <div className="special-note-box">🎉 <strong>Online Special:</strong> Chicken Shawarma Wrap — $7.99!</div>
+            {specialOffer?.isActive && (
+              <div className="special-note-box">🎉 <strong>Online Special:</strong> {specialOffer.title} — {specialOffer.price}!</div>
+            )}
             <button className="btn btn-primary w-full" style={{ justifyContent: 'center' }} onClick={() => navigate('/checkout')}>
               Proceed to Checkout <ArrowRight size={18} />
             </button>

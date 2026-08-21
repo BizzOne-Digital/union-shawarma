@@ -16,11 +16,13 @@ const Footer = () => {
   const [deliveryPartners, setDeliveryPartners] = useState({});
   const [socialLinks, setSocialLinks] = useState({});
   const [hours, setHours] = useState(FALLBACK_HOURS);
+  const [specialOffer, setSpecialOffer] = useState(null);
 
   useEffect(() => {
     getSettings().then((res) => {
       setDeliveryPartners(res.data?.deliveryPartners || {});
       setSocialLinks(res.data?.socialLinks || {});
+      setSpecialOffer(res.data?.specialOffer || null);
       const grouped = groupBusinessHours(res.data?.businessHours);
       if (grouped.length > 0) setHours(grouped);
     }).catch(() => {});
@@ -94,9 +96,13 @@ const Footer = () => {
                 <li><Mail size={16} /> <span>theunionshawarma@gmail.com</span></li>
                 <li><MapPin size={16} /> <span>www.theunionshawarma.ca</span></li>
               </ul>
-              <div className="footer-special">
-                <p className="special-label">Online Special</p>
-                <p className="special-offer">Chicken Shawarma Wrap <strong>$7.99</strong></p>
+              {specialOffer?.isActive && (
+                <div className="footer-special">
+                  <p className="special-label">Online Special</p>
+                  <p className="special-offer">{specialOffer.title} {specialOffer.price && <strong>{specialOffer.price}</strong>}</p>
+                </div>
+              )}
+              <div>
                 <Link to="/menu" className="btn btn-primary" style={{ marginTop: '12px', padding: '10px 20px', fontSize: '13px' }}>
                   Order Online
                 </Link>

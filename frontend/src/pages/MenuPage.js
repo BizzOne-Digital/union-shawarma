@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
-import { getMenuItems, getCategories } from '../utils/api';
+import { getMenuItems, getCategories, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
 import './MenuPage.css';
@@ -13,6 +13,7 @@ const MenuPage = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [customizeItem, setCustomizeItem] = useState(null);
+  const [specialOffer, setSpecialOffer] = useState(null);
   const { addToCart } = useCart();
 
   const handleAddClick = (item) => {
@@ -31,9 +32,10 @@ const MenuPage = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [menuRes, catRes] = await Promise.all([getMenuItems(), getCategories()]);
+        const [menuRes, catRes, settingsRes] = await Promise.all([getMenuItems(), getCategories(), getSettings()]);
         setItems(menuRes.data);
         setCategories(catRes.data);
+        setSpecialOffer(settingsRes.data?.specialOffer || null);
       } catch (err) {
         console.error(err);
       } finally {
@@ -140,11 +142,13 @@ const MenuPage = () => {
       </div>
 
       {/* Online special banner */}
-      <div className="online-special-banner">
-        <div className="container">
-          <p>🎉 <strong>Online Special:</strong> Chicken Shawarma Wrap for just <strong>$7.99</strong> when you order online!</p>
+      {specialOffer?.isActive && (
+        <div className="online-special-banner">
+          <div className="container">
+            <p>🎉 <strong>Online Special:</strong> {specialOffer.title} for just <strong>{specialOffer.price}</strong> when you order online!</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {customizeItem && (
         <CustomizeModal

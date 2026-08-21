@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { getMenuItems, getCategories } from '../utils/api';
+import { getMenuItems, getCategories, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
 
@@ -11,11 +11,12 @@ const PricingPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(true);
   const [customizeItem, setCustomizeItem] = useState(null);
+  const [specialOffer, setSpecialOffer] = useState(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    Promise.all([getMenuItems(), getCategories()])
-      .then(([mRes, cRes]) => { setItems(mRes.data); setCategories(cRes.data); })
+    Promise.all([getMenuItems(), getCategories(), getSettings()])
+      .then(([mRes, cRes, sRes]) => { setItems(mRes.data); setCategories(cRes.data); setSpecialOffer(sRes.data?.specialOffer || null); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -68,11 +69,13 @@ const PricingPage = () => {
           </div>
         )}
 
-        <div style={{ marginTop: '48px', background: 'linear-gradient(135deg, var(--orange), var(--red))', borderRadius: '20px', padding: '36px', textAlign: 'center' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '800', color: 'white', marginBottom: '8px' }}>🎉 Online Special</h3>
-          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px' }}>Chicken Shawarma Wrap for just <strong>$7.99</strong> when you order online!</p>
-          <a href="/menu" style={{ display: 'inline-block', marginTop: '20px', background: 'white', color: 'var(--orange)', padding: '12px 28px', borderRadius: '50px', fontWeight: '700', fontSize: '15px' }}>Order Online Now</a>
-        </div>
+        {specialOffer?.isActive && (
+          <div style={{ marginTop: '48px', background: 'linear-gradient(135deg, var(--orange), var(--red))', borderRadius: '20px', padding: '36px', textAlign: 'center' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '800', color: 'white', marginBottom: '8px' }}>🎉 Online Special</h3>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px' }}>{specialOffer.title} for just <strong>{specialOffer.price}</strong> when you order online!</p>
+            <a href="/menu" style={{ display: 'inline-block', marginTop: '20px', background: 'white', color: 'var(--orange)', padding: '12px 28px', borderRadius: '50px', fontWeight: '700', fontSize: '15px' }}>Order Online Now</a>
+          </div>
+        )}
       </div>
 
       {customizeItem && (
