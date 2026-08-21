@@ -3,20 +3,30 @@ const Coupon = require('../models/Coupon');
 const BOGO_FRACTION = { bogo50: 0.5, bogo100: 1 };
 const isBogo = (discountType) => discountType in BOGO_FRACTION;
 
-// Buy-1-get-1-X-off: the coupon discounts ONE pair (2 units) of the same qualifying item per use —
+// Buy-1-get-1-X-off: the coupon discounts ONE pair (2 units) of the same qualifying menu item per use —
 // e.g. 4 of the same item still only gets the discount applied to 2 of them, not all 4.
+// Two cart lines for the same menu item with different toppings/customizations still count
+// as "the same item" for this purpose — only the base menuItem has to match, not the toppings.
 // If the coupon restricts to specific items (applicableItems), only those items qualify.
 const computeBogoDiscount = (items, coupon) => {
   if (!Array.isArray(items)) return 0;
   const fraction = BOGO_FRACTION[coupon.discountType] ?? 0;
   const restrictTo = coupon?.applicableItems?.length ? new Set(coupon.applicableItems.map((id) => String(id))) : null;
 
-  const qualifying = items.find((item) => {
-    if (restrictTo && !restrictTo.has(String(item.menuItem))) return false;
-    return (item.quantity || 0) >= 2;
+  const totalsByMenuItem = new Map(); // menuItem id -> { quantity, price }
+  items.forEach((item) => {
+    const key = String(item.menuItem);
+    if (restrictTo && !restrictTo.has(key)) return;
+    const existing = totalsByMenuItem.get(key);
+    if (existing) {
+      existing.quantity += item.quantity || 0;
+    } else {
+      totalsByMenuItem.set(key, { quantity: item.quantity || 0, price: item.price || 0 });
+    }
   });
 
-  return qualifying ? (qualifying.price || 0) * fraction : 0;
+  const qualifying = [...totalsByMenuItem.values()].find((group) => group.quantity >= 2);
+  return qualifying ? qualifying.price * fraction : 0;
 };
 
 const computeDiscount = (coupon, subtotal, items) => {
