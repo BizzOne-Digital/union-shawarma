@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Clock, Instagram, Facebook } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Instagram, Facebook, Twitter } from 'lucide-react';
 import { getSettings } from '../../utils/api';
 import { groupBusinessHours } from '../../utils/formatHours';
 import './Footer.css';
@@ -45,6 +45,11 @@ const Footer = () => {
                 <a href={socialLinks.facebook || 'https://www.facebook.com'} target="_blank" rel="noreferrer" aria-label="Facebook">
                   <Facebook size={18} />
                 </a>
+                {socialLinks.twitter && (
+                  <a href={socialLinks.twitter} target="_blank" rel="noreferrer" aria-label="Twitter">
+                    <Twitter size={18} />
+                  </a>
+                )}
               </div>
               <div className="footer-delivery">
                 <p style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Also Available On</p>

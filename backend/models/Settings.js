@@ -30,6 +30,7 @@ const settingsSchema = new mongoose.Schema(
       instagram: String,
       facebook: String,
       tiktok: String,
+      twitter: String,
     },
     deliveryPartners: {
       uberEats: String,

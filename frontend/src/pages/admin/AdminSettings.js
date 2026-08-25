@@ -137,6 +137,10 @@ const AdminSettings = () => {
               <label>Facebook</label>
               <input className="form-control" value={social.facebook || ''} onChange={e => setSocial({ ...social, facebook: e.target.value })} />
             </div>
+            <div className="form-group">
+              <label>Twitter / X</label>
+              <input className="form-control" value={social.twitter || ''} onChange={e => setSocial({ ...social, twitter: e.target.value })} placeholder="https://x.com/yourhandle" />
+            </div>
             <h3 style={{ marginTop: '20px' }}>Delivery Partners</h3>
             {[['uberEats', 'Uber Eats Link'], ['doordash', 'DoorDash Link'], ['skipTheDishes', 'Skip The Dishes Link']].map(([key, label]) => (
               <div className="form-group" key={key}>

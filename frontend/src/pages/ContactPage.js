@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Mail, Clock, Instagram, Facebook, MapPin } from 'lucide-react';
+import { Phone, Mail, Clock, Instagram, Facebook, Twitter, MapPin } from 'lucide-react';
 import { getSettings } from '../utils/api';
 import { groupBusinessHours } from '../utils/formatHours';
 import './ContactPage.css';
@@ -69,6 +69,7 @@ const ContactPage = () => {
                 {[
                   { icon: <Instagram size={20} />, label: '@Theunionshawarma', href: 'https://www.instagram.com/theunionshawarma', color: '#E1306C' },
                   { icon: <Facebook size={20} />, label: 'Facebook', href: socialLinks.facebook || 'https://www.facebook.com', color: '#1877F2' },
+                  ...(socialLinks.twitter ? [{ icon: <Twitter size={20} />, label: 'Twitter', href: socialLinks.twitter, color: '#1DA1F2' }] : []),
                 ].map((s, i) => (
                   <a key={i} href={s.href} target="_blank" rel="noreferrer"
                     style={{ flex: '1 1 140px', minWidth: 0, display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', border: '1px solid var(--border)', background: 'white', color: 'var(--dark)', transition: 'all 0.2s', fontWeight: '600', fontSize: '14px' }}
