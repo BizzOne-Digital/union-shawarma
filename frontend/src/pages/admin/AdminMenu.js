@@ -11,7 +11,7 @@ const EMPTY_FORM = {
   calories: '', allergens: '', order: 0,
 };
 
-const EMPTY_GROUP = { name: '', required: true, multiSelect: false, options: [] };
+const EMPTY_GROUP = { name: '', required: true, multiSelect: false, optionsText: '' };
 
 const AdminMenu = () => {
   const [items, setItems] = useState([]);
@@ -47,7 +47,7 @@ const AdminMenu = () => {
       isFeatured: item.isFeatured, isPopular: item.isPopular, isMustTry: item.isMustTry,
       calories: item.calories || '', allergens: item.allergens?.join(', ') || '', order: item.order || 0,
     });
-    setCustomizationGroups(item.customizationGroups?.map(g => ({ ...g, options: [...g.options] })) || []);
+    setCustomizationGroups(item.customizationGroups?.map(g => ({ name: g.name, required: g.required, multiSelect: g.multiSelect, optionsText: g.options.join(', ') })) || []);
     setImagePreview(item.image || '');
     setImageFile(null);
     setShowModal(true);
@@ -56,7 +56,7 @@ const AdminMenu = () => {
   const addGroup = () => setCustomizationGroups(prev => [...prev, { ...EMPTY_GROUP }]);
   const removeGroup = (idx) => setCustomizationGroups(prev => prev.filter((_, i) => i !== idx));
   const updateGroup = (idx, field, value) => setCustomizationGroups(prev => prev.map((g, i) => i === idx ? { ...g, [field]: value } : g));
-  const updateGroupOptions = (idx, optionsStr) => updateGroup(idx, 'options', optionsStr.split(',').map(s => s.trim()).filter(Boolean));
+  const updateGroupOptions = (idx, optionsStr) => updateGroup(idx, 'optionsText', optionsStr);
 
   const handleImage = (e) => {
     const file = e.target.files[0];
@@ -74,7 +74,14 @@ const AdminMenu = () => {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (form.allergens) fd.set('allergens', JSON.stringify(form.allergens.split(',').map(s => s.trim()).filter(Boolean)));
       else fd.set('allergens', JSON.stringify([]));
-      const cleanGroups = customizationGroups.filter(g => g.name.trim() && g.options.length > 0);
+      const cleanGroups = customizationGroups
+        .map(g => ({
+          name: g.name,
+          required: g.required,
+          multiSelect: g.multiSelect,
+          options: (g.optionsText || '').split(',').map(s => s.trim()).filter(Boolean),
+        }))
+        .filter(g => g.name.trim() && g.options.length > 0);
       fd.set('customizationGroups', JSON.stringify(cleanGroups));
       if (imageFile) fd.append('image', imageFile);
 
@@ -250,7 +257,7 @@ const AdminMenu = () => {
                       <input
                         className="form-control"
                         placeholder="Options, comma-separated (e.g. Hot Sauce, Chipotle Sauce, No Sauce)"
-                        value={group.options.join(', ')}
+                        value={group.optionsText}
                         onChange={e => updateGroupOptions(idx, e.target.value)}
                         style={{ marginBottom: '8px' }}
                       />
