@@ -84,8 +84,7 @@ const CheckoutPage = () => {
       }
 
       clearCart();
-      toast.success('Order placed! We will confirm shortly.');
-      navigate('/');
+      navigate(`/order-confirmation?orderId=${order._id}&status=placed`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Order failed. Please try again.');
     } finally {

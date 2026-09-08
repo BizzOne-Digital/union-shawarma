@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
-import { confirmCloverPayment } from '../utils/api';
+import { confirmCloverPayment, getOrder } from '../utils/api';
 import { useCart } from '../context/CartContext';
 
 const OrderConfirmationPage = () => {
@@ -10,14 +10,24 @@ const OrderConfirmationPage = () => {
   const { clearCart } = useCart();
   const orderId = searchParams.get('orderId');
   const cancelled = searchParams.get('status') === 'cancelled';
-  const [state, setState] = useState(cancelled ? 'cancelled' : 'checking');
+  const alreadyPlaced = searchParams.get('status') === 'placed';
+  const [state, setState] = useState(cancelled ? 'cancelled' : alreadyPlaced ? 'placed' : 'checking');
+  const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    if (cancelled || !orderId) return;
+    if (!orderId) return;
+    if (cancelled) return;
+
+    if (alreadyPlaced) {
+      getOrder(orderId).then((res) => setOrder(res.data)).catch(() => {});
+      return;
+    }
+
     confirmCloverPayment({ orderId })
       .then((res) => {
         if (res.data.paymentStatus === 'paid') {
           clearCart();
+          setOrder(res.data.order);
           setState('paid');
         } else {
           setState('failed');
@@ -25,7 +35,7 @@ const OrderConfirmationPage = () => {
       })
       .catch(() => setState('failed'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, cancelled]);
+  }, [orderId, cancelled, alreadyPlaced]);
 
   const content = {
     checking: {
@@ -37,6 +47,11 @@ const OrderConfirmationPage = () => {
       icon: <CheckCircle2 size={48} style={{ color: '#388E3C' }} />,
       title: 'Payment Successful!',
       desc: 'Your order has been placed and paid. We will start preparing it shortly.',
+    },
+    placed: {
+      icon: <CheckCircle2 size={48} style={{ color: '#388E3C' }} />,
+      title: 'Order Placed!',
+      desc: 'Your order has been received. Pay at pickup — we will start preparing it shortly.',
     },
     failed: {
       icon: <XCircle size={48} style={{ color: 'var(--red)' }} />,
@@ -58,9 +73,18 @@ const OrderConfirmationPage = () => {
       >
         <div style={{ marginBottom: '16px' }}>{content.icon}</div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '800', marginBottom: '10px' }}>{content.title}</h1>
-        <p style={{ color: 'var(--gray)', marginBottom: '28px', lineHeight: '1.6' }}>{content.desc}</p>
+        <p style={{ color: 'var(--gray)', marginBottom: order ? '16px' : '28px', lineHeight: '1.6' }}>{content.desc}</p>
 
-        {state === 'paid' ? (
+        {order && (state === 'paid' || state === 'placed') && (
+          <div style={{ background: 'white', borderRadius: '14px', padding: '16px 20px', marginBottom: '24px', textAlign: 'left', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: '13px', color: 'var(--gray)', marginBottom: '4px' }}>Order Number</p>
+            <p style={{ fontWeight: '700', marginBottom: '10px' }}>#{order._id?.slice(-8).toUpperCase()}</p>
+            <p style={{ fontSize: '13px', color: 'var(--gray)', marginBottom: '4px' }}>Total</p>
+            <p style={{ fontWeight: '700', color: 'var(--orange)' }}>${order.totalAmount?.toFixed(2)}</p>
+          </div>
+        )}
+
+        {state === 'paid' || state === 'placed' ? (
           <Link to="/" className="btn btn-primary btn-lg">Back to Home</Link>
         ) : state !== 'checking' ? (
           <Link to="/checkout" className="btn btn-primary btn-lg">Return to Checkout</Link>
