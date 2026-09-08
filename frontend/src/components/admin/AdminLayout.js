@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag, Users,
   Image, Settings, Tag, LogOut, Menu, ChevronRight, Heart, DollarSign
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { getOrderStats } from '../../utils/api';
 import PageTransition from '../common/PageTransition';
 import './AdminLayout.css';
+
+const POLL_MS = 20000;
+
+// Beeps using the Web Audio API — no audio file needed.
+const playAlertSound = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.25, 0.5].forEach((delay) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.2);
+    });
+  } catch { /* audio not available */ }
+};
 
 const navItems = [
   { label: 'Dashboard', path: '/admin', icon: <LayoutDashboard size={20} /> },
@@ -23,11 +45,40 @@ const navItems = [
 const AdminLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const lastCount = useRef(null); // null = not yet initialized, so we don't alert on first load
   const { logout, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => { logout(); navigate('/'); };
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    const poll = () => {
+      getOrderStats()
+        .then((res) => {
+          const count = res.data?.pendingOrders || 0;
+          setPendingCount(count);
+          document.title = count > 0 ? `(${count}) Admin Panel — The Union Shawarma` : 'The Union Shawarma';
+          if (lastCount.current !== null && count > lastCount.current) {
+            playAlertSound();
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('New order received!', { body: `${count} order(s) awaiting confirmation.` });
+            }
+          }
+          lastCount.current = count;
+        })
+        .catch(() => {});
+    };
+
+    poll();
+    const interval = setInterval(poll, POLL_MS);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={`admin-layout ${collapsed ? 'collapsed' : ''}`}>
@@ -61,6 +112,9 @@ const AdminLayout = ({ children }) => {
             >
               <span className="nav-icon">{item.icon}</span>
               {!collapsed && <span className="nav-label">{item.label}</span>}
+              {item.path === '/admin/orders' && pendingCount > 0 && (
+                <span className="nav-badge">{pendingCount}</span>
+              )}
             </Link>
           ))}
         </nav>
