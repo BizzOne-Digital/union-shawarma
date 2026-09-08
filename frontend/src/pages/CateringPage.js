@@ -3,9 +3,15 @@ import { motion } from 'framer-motion';
 import { Users, Calendar, MapPin, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getMenuItems, submitCateringRequest } from '../utils/api';
+import useSEO from '../utils/useSEO';
 import './CateringPage.css';
 
 const CateringPage = () => {
+  useSEO(
+    'Catering for Bulk Orders | Union Shawarma | Hamilton',
+    'Planning an event? Union Shawarma offers delicious shawarma catering in Hamilton for parties, corporate events, gatherings and special occasions.'
+  );
+
   const [featured, setFeatured] = useState([]);
   const [form, setForm] = useState({ name: '', email: '', phone: '', location: '', eventDate: '', guestCount: '', message: '' });
   const [submitting, setSubmitting] = useState(false);

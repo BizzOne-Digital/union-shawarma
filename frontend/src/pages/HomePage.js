@@ -5,6 +5,7 @@ import { Flame, Leaf, Truck, Star, ArrowRight, Plus, ShoppingBag } from 'lucide-
 import { getMenuItems, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
+import useSEO from '../utils/useSEO';
 import './HomePage.css';
 
 const fadeUp = {
@@ -54,6 +55,11 @@ const MenuCard = ({ item }) => {
 };
 
 const HomePage = () => {
+  useSEO(
+    'Union Shawarma | Best Shawarma in Hamilton | Order Online',
+    'Enjoy fresh chicken & beef shawarma, wraps, platters, rice bowls and more at Union Shawarma. Order online today!'
+  );
+
   const [popularItems, setPopularItems] = useState([]);
   const [mustTryItems, setMustTryItems] = useState([]);
   const [loading, setLoading] = useState(true);

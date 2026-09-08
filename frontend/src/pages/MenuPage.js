@@ -4,9 +4,15 @@ import { Search, Plus } from 'lucide-react';
 import { getMenuItems, getCategories, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
+import useSEO from '../utils/useSEO';
 import './MenuPage.css';
 
 const MenuPage = () => {
+  useSEO(
+    'Union Shawarma Menu | Hamilton |  Wraps & More',
+    'Explore the Union Shawarma menu with variety of wraps, platters, rice bowls, loaded fries, falafel, sides and more.'
+  );
+
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');

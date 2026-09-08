@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Phone, Mail, Clock, Instagram, Facebook, Twitter, MapPin } from 'lucide-react';
 import { getSettings } from '../utils/api';
 import { groupBusinessHours } from '../utils/formatHours';
+import useSEO from '../utils/useSEO';
 import './ContactPage.css';
 
 const FALLBACK_HOURS = [
@@ -13,6 +14,10 @@ const FALLBACK_HOURS = [
 ];
 
 const ContactPage = () => {
+  useSEO(
+    'Contact Union Shawarma | Best Shawarma in Hamilton',
+    'Contact Union Shawarma for orders, catering, questions and more. Find our location, hours and contact information.'
+  );
   const [socialLinks, setSocialLinks] = useState({});
   const [hours, setHours] = useState(FALLBACK_HOURS);
 

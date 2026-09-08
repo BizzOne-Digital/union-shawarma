@@ -4,8 +4,14 @@ import { Plus } from 'lucide-react';
 import { getMenuItems, getCategories, getSettings } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import CustomizeModal from '../components/common/CustomizeModal';
+import useSEO from '../utils/useSEO';
 
 const PricingPage = () => {
+  useSEO(
+    'Shawarma Prices & Meal Deals | Union Shawarma',
+    'View Union Shawarma prices for wraps, platters, rice bowls, loaded fries, combos and more. Enjoy fresh shawarma and great-value meals in Hamilton.'
+  );
+
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('all');

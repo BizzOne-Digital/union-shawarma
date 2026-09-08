@@ -1,9 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Leaf, Heart, Star } from 'lucide-react';
+import useSEO from '../utils/useSEO';
 import './AboutPage.css';
 
 const AboutPage = () => {
+  useSEO(
+    'About Union Shawarma | Fresh & Authentic Shawarma in Hamilton',
+    'Get to know Union Shawarma, your destination for fresh, flavorful shawarma, wraps, platters and Middle Eastern-inspired food.'
+  );
+
   const values = [
     { icon: <Flame size={28} />, title: 'Authentic Recipes', desc: 'Every marinade and sauce is made from original recipes passed through tradition.' },
     { icon: <Leaf size={28} />, title: 'Fresh Daily', desc: 'We source fresh ingredients every day — no frozen shortcuts, ever.' },
