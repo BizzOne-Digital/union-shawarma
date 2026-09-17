@@ -11,22 +11,27 @@ import './AdminLayout.css';
 
 const POLL_MS = 20000;
 
-// Beeps using the Web Audio API — no audio file needed.
+// Alternating two-tone alarm using the Web Audio API — no audio file needed.
+// Runs for ~15 seconds so it's hard to miss even if no one is looking at the screen.
+const ALERT_DURATION_MS = 15000;
 const playAlertSound = () => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.25, 0.5].forEach((delay) => {
+    const beepSpacing = 0.4; // seconds between beeps
+    const beepCount = Math.floor(ALERT_DURATION_MS / 1000 / beepSpacing);
+    for (let i = 0; i < beepCount; i++) {
+      const delay = i * beepSpacing;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.type = 'sine';
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.15, ctx.currentTime + delay);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+      osc.frequency.value = i % 2 === 0 ? 880 : 660; // alternate pitch so it reads as an alarm, not a loop
+      gain.gain.setValueAtTime(0.18, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
       osc.start(ctx.currentTime + delay);
-      osc.stop(ctx.currentTime + delay + 0.2);
-    });
+      osc.stop(ctx.currentTime + delay + 0.25);
+    }
   } catch { /* audio not available */ }
 };
 
