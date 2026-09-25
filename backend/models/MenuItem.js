@@ -21,7 +21,13 @@ const menuItemSchema = new mongoose.Schema(
         name: { type: String, required: true }, // e.g. "Base Sauce", "Toppings", "Select Sauces"
         required: { type: Boolean, default: false },
         multiSelect: { type: Boolean, default: false },
-        options: [{ type: String, required: true }],
+        options: [
+          {
+            _id: false,
+            label: { type: String, required: true },
+            extraPrice: { type: Number, default: 0, min: 0 }, // added to item price when this option is selected
+          },
+        ],
       },
     ],
   },

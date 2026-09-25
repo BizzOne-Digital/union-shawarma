@@ -88,7 +88,7 @@ const PricingPage = () => {
         <CustomizeModal
           item={customizeItem}
           onClose={() => setCustomizeItem(null)}
-          onConfirm={(selections) => { addToCart(customizeItem, selections); setCustomizeItem(null); }}
+          onConfirm={(selections, totalPrice) => { addToCart(customizeItem, selections, totalPrice); setCustomizeItem(null); }}
         />
       )}
 

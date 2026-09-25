@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -7,17 +7,30 @@ import './CustomizeModal.css';
 const CustomizeModal = ({ item, onClose, onConfirm }) => {
   const [selections, setSelections] = useState({});
 
-  const toggleSingle = (groupName, option) => {
-    setSelections((prev) => ({ ...prev, [groupName]: [option] }));
+  const toggleSingle = (groupName, label) => {
+    setSelections((prev) => ({ ...prev, [groupName]: [label] }));
   };
 
-  const toggleMulti = (groupName, option) => {
+  const toggleMulti = (groupName, label) => {
     setSelections((prev) => {
       const current = prev[groupName] || [];
-      const exists = current.includes(option);
-      return { ...prev, [groupName]: exists ? current.filter((o) => o !== option) : [...current, option] };
+      const exists = current.includes(label);
+      return { ...prev, [groupName]: exists ? current.filter((o) => o !== label) : [...current, label] };
     });
   };
+
+  const extraTotal = useMemo(() => {
+    let sum = 0;
+    item.customizationGroups.forEach((group) => {
+      (selections[group.name] || []).forEach((label) => {
+        const opt = group.options.find((o) => o.label === label);
+        if (opt?.extraPrice) sum += opt.extraPrice;
+      });
+    });
+    return sum;
+  }, [selections, item.customizationGroups]);
+
+  const totalPrice = item.price + extraTotal;
 
   const handleConfirm = () => {
     for (const group of item.customizationGroups) {
@@ -26,7 +39,7 @@ const CustomizeModal = ({ item, onClose, onConfirm }) => {
         return;
       }
     }
-    onConfirm(selections);
+    onConfirm(selections, totalPrice);
   };
 
   return (
@@ -45,7 +58,7 @@ const CustomizeModal = ({ item, onClose, onConfirm }) => {
             <img src={item.image || '/placeholder-food.jpg'} alt={item.name} />
             <div>
               <h3>{item.name}</h3>
-              <span className="customize-price">${item.price.toFixed(2)}</span>
+              <span className="customize-price">${totalPrice.toFixed(2)}</span>
             </div>
           </div>
 
@@ -58,16 +71,17 @@ const CustomizeModal = ({ item, onClose, onConfirm }) => {
                 </div>
                 <div className="customize-options">
                   {group.options.map((option) => {
-                    const selected = (selections[group.name] || []).includes(option);
+                    const selected = (selections[group.name] || []).includes(option.label);
                     return (
                       <button
-                        key={option}
+                        key={option.label}
                         type="button"
                         className={`customize-option ${selected ? 'selected' : ''}`}
-                        onClick={() => (group.multiSelect ? toggleMulti(group.name, option) : toggleSingle(group.name, option))}
+                        onClick={() => (group.multiSelect ? toggleMulti(group.name, option.label) : toggleSingle(group.name, option.label))}
                       >
                         {selected && <Check size={14} />}
-                        {option}
+                        {option.label}
+                        {option.extraPrice > 0 && <span className="option-extra-price"> +${option.extraPrice.toFixed(2)}</span>}
                       </button>
                     );
                   })}
@@ -77,7 +91,7 @@ const CustomizeModal = ({ item, onClose, onConfirm }) => {
           </div>
 
           <button className="btn btn-primary w-full customize-confirm" onClick={handleConfirm}>
-            Add to Cart — ${item.price.toFixed(2)}
+            Add to Cart — ${totalPrice.toFixed(2)}
           </button>
         </motion.div>
       </motion.div>

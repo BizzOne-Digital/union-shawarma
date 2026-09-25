@@ -15,8 +15,9 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('unionCart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item, customizations = {}) => {
+  const addToCart = (item, customizations = {}, priceOverride) => {
     const cartId = buildCartId(item._id, customizations);
+    const price = typeof priceOverride === 'number' ? priceOverride : item.price;
     setCartItems((prev) => {
       const existing = prev.find((i) => i.cartId === cartId);
       if (existing) {
@@ -24,7 +25,7 @@ export const CartProvider = ({ children }) => {
         return prev.map((i) => i.cartId === cartId ? { ...i, quantity: i.quantity + 1 } : i);
       }
       toast.success(`${item.name} added to cart!`);
-      return [...prev, { ...item, customizations, cartId, quantity: 1 }];
+      return [...prev, { ...item, price, customizations, cartId, quantity: 1 }];
     });
   };
 

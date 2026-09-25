@@ -13,6 +13,14 @@ const EMPTY_FORM = {
 
 const EMPTY_GROUP = { name: '', required: true, multiSelect: false, optionsText: '' };
 
+// Options are edited as comma-separated text; "Cheese:1.50" adds a $1.50 upcharge, plain "Lettuce" has none.
+const optionsToText = (options) => (options || []).map(o => o.extraPrice > 0 ? `${o.label}:${o.extraPrice}` : o.label).join(', ');
+const textToOptions = (text) => (text || '').split(',').map(s => s.trim()).filter(Boolean).map(token => {
+  const [label, priceStr] = token.split(':').map(s => s.trim());
+  const extraPrice = priceStr ? Number(priceStr) : 0;
+  return { label, extraPrice: Number.isFinite(extraPrice) && extraPrice > 0 ? extraPrice : 0 };
+});
+
 const AdminMenu = () => {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -47,7 +55,7 @@ const AdminMenu = () => {
       isFeatured: item.isFeatured, isPopular: item.isPopular, isMustTry: item.isMustTry,
       calories: item.calories || '', allergens: item.allergens?.join(', ') || '', order: item.order || 0,
     });
-    setCustomizationGroups(item.customizationGroups?.map(g => ({ name: g.name, required: g.required, multiSelect: g.multiSelect, optionsText: g.options.join(', ') })) || []);
+    setCustomizationGroups(item.customizationGroups?.map(g => ({ name: g.name, required: g.required, multiSelect: g.multiSelect, optionsText: optionsToText(g.options) })) || []);
     setImagePreview(item.image || '');
     setImageFile(null);
     setShowModal(true);
@@ -79,7 +87,7 @@ const AdminMenu = () => {
           name: g.name,
           required: g.required,
           multiSelect: g.multiSelect,
-          options: (g.optionsText || '').split(',').map(s => s.trim()).filter(Boolean),
+          options: textToOptions(g.optionsText),
         }))
         .filter(g => g.name.trim() && g.options.length > 0);
       fd.set('customizationGroups', JSON.stringify(cleanGroups));
@@ -256,11 +264,14 @@ const AdminMenu = () => {
                       </div>
                       <input
                         className="form-control"
-                        placeholder="Options, comma-separated (e.g. Hot Sauce, Chipotle Sauce, No Sauce)"
+                        placeholder="Options, comma-separated. Add :price for an upcharge (e.g. Hot Sauce, Cheese:1.50, No Sauce)"
                         value={group.optionsText}
                         onChange={e => updateGroupOptions(idx, e.target.value)}
-                        style={{ marginBottom: '8px' }}
+                        style={{ marginBottom: '4px' }}
                       />
+                      <p style={{ fontSize: '11px', color: 'var(--gray)', marginBottom: '8px' }}>
+                        Tip: type <code>OptionName:1.50</code> to charge an extra $1.50 for that option. Plain names have no extra charge.
+                      </p>
                       <div style={{ display: 'flex', gap: '16px' }}>
                         <label className="checkbox-label">
                           <input type="checkbox" checked={group.required} onChange={e => updateGroup(idx, 'required', e.target.checked)} />

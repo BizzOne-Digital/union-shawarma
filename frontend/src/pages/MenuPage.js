@@ -30,8 +30,8 @@ const MenuPage = () => {
     }
   };
 
-  const handleConfirmCustomization = (selections) => {
-    addToCart(customizeItem, selections);
+  const handleConfirmCustomization = (selections, totalPrice) => {
+    addToCart(customizeItem, selections, totalPrice);
     setCustomizeItem(null);
   };
 
