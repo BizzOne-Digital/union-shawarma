@@ -50,8 +50,16 @@ const sendOrderNotification = async (order) => {
     return;
   }
 
+  const formatCustomizations = (customizations) => {
+    if (!customizations || Object.keys(customizations).length === 0) return '';
+    const groupsHtml = Object.entries(customizations)
+      .map(([groupName, values]) => `<li style="margin-left:16px;"><strong>${groupName}:</strong> ${values.join(', ')}</li>`)
+      .join('');
+    return `<ul style="margin:4px 0;padding:0;list-style:none;">${groupsHtml}</ul>`;
+  };
+
   const itemsHtml = order.items
-    .map((i) => `<li>${i.quantity}x ${i.name} — $${i.price.toFixed(2)}${i.customizations ? ` (${Object.values(i.customizations).flat().join(', ')})` : ''}</li>`)
+    .map((i) => `<li>${i.quantity}x ${i.name} — $${i.price.toFixed(2)}${formatCustomizations(i.customizations)}</li>`)
     .join('');
 
   const html = `
