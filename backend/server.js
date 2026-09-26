@@ -22,6 +22,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// UpliftAI is proxied through the backend so its API token is never exposed
+// to the browser. This route does not require a database connection.
+app.use('/api/blogs', require('./routes/blogRoutes'));
+
 // MongoDB connection (cached across serverless invocations)
 let isConnected = false;
 const connectDB = async () => {

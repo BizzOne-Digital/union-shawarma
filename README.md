@@ -49,6 +49,7 @@ npm start
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret |
 | `FRONTEND_URL` | Deployed frontend URL(s) for CORS, comma-separated |
+| `UPLIFTAI_API_KEY` | Server-side UpliftAI bearer token used to load published blog content |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | Optional — SMTP creds to email catering inquiries and new orders. If unset, both are still saved to the DB and visible in Admin → Catering / Admin → Orders, just no email is sent. |
 | `CATERING_NOTIFY_EMAIL` | Optional — inbox that receives catering inquiry emails (requires SMTP vars above) |
 | `ORDER_NOTIFY_EMAIL` | Optional — inbox that receives new-order emails. Falls back to `CATERING_NOTIFY_EMAIL` if not set. |
@@ -96,6 +97,8 @@ db.users.updateOne(
 - `/gallery` — Photo gallery with lightbox
 - `/pricing` — Menu pricing grid
 - `/contact` — Contact info + hours
+- `/blog` — Published articles from UpliftAI
+- `/blog/:slug` — Individual blog article
 - `/login` — Sign in
 - `/register` — Create account
 - `/cart` — Shopping cart

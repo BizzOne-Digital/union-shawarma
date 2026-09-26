@@ -16,6 +16,8 @@ import RegisterPage from './pages/RegisterPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import BlogPage from './pages/BlogPage';
+import BlogDetailPage from './pages/BlogDetailPage';
 
 // Customer Pages
 import ProfilePage from './pages/customer/ProfilePage';
@@ -70,6 +72,8 @@ function AppRoutes() {
       <Route path="/catering" element={<PublicLayout><CateringPage /></PublicLayout>} />
       <Route path="/pricing" element={<PublicLayout><PricingPage /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+      <Route path="/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
+      <Route path="/blog/:slug" element={<PublicLayout><BlogDetailPage /></PublicLayout>} />
       <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
       <Route path="/register" element={<PublicLayout><RegisterPage /></PublicLayout>} />
       <Route path="/cart" element={<PublicLayout><CartPage /></PublicLayout>} />

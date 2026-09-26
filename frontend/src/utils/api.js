@@ -72,4 +72,8 @@ export const createCoupon = (data) => API.post('/coupons', data);
 export const updateCoupon = (id, data) => API.put(`/coupons/${id}`, data);
 export const deleteCoupon = (id) => API.delete(`/coupons/${id}`);
 
+// Blog (proxied through the backend to keep the UpliftAI token private)
+export const getBlogs = (params) => API.get('/blogs', { params });
+export const getBlogBySlug = (slug) => API.get(`/blogs/${encodeURIComponent(slug)}`);
+
 export default API;

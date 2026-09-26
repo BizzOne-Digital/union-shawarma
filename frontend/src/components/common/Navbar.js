@@ -28,6 +28,7 @@ const Navbar = () => {
     { label: 'Catering', path: '/catering' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'About', path: '/about' },
+    { label: 'Blog', path: '/blog' },
     { label: 'Contact', path: '/contact' },
   ];
 
@@ -44,7 +45,7 @@ const Navbar = () => {
           <ul className={`nav-links ${isOpen ? 'open' : ''}`}>
             {navLinks.map(link => (
               <li key={link.path}>
-                <Link to={link.path} className={location.pathname === link.path ? 'active' : ''}>
+                <Link to={link.path} className={location.pathname === link.path || location.pathname.startsWith(`${link.path}/`) ? 'active' : ''}>
                   {link.label}
                 </Link>
               </li>
